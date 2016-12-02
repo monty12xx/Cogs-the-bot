@@ -14,6 +14,7 @@ class test:
 
     @commands.command(pass_context=True, no_pm=True)
     async def serverinfo(self, ctx):
+        server = ctx.message.server
         colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
         colour = int(colour, 16)
         passed = (ctx.message.timestamp - server.created_at).days

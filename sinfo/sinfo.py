@@ -13,7 +13,7 @@ class test:
 
 
     @commands.command(pass_context=True, no_pm=True)
-    async def serverinfo(self, ctx):
+    async def sinfos(self, ctx):
         server = ctx.message.server
         colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
         colour = int(colour, 16)
@@ -33,10 +33,6 @@ class test:
         em.add_field(name="Verification Level", value=str(server.verification_level))
         em.set_thumbnail(url=sever.icon_url)
         await self.bot.say(embed=em)
-        if len(str(server.emojis)) < 1024 and server.emojis:
-            em.add_field(name="Emojis", value=" ".join([str(emoji) for emoji in server.emojis]), inline=False)
-        elif len(str(server.emojis)) >= 1024:
-            em.add_field(name="Emojis", value="**Error**: _Too many emojis_", inline=False)
 
 def setup(bot):
     n = test(bot)

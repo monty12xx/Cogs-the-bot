@@ -20,7 +20,6 @@ class move:
                 await self.bot.move_member(user, channel)
                 await self.bot.say("Moved **{0}** to **__{1}__**".format(user, channel))
                 await asyncio.sleep(1)
-                await self.bot.say("**Done :thumbup::skin-tone-2:**")
             except discord.Forbidden:
                 await self.bot.say("I need the moving perms")
 

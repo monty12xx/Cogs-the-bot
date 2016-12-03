@@ -22,10 +22,10 @@ class move:
                 await self.bot.say("**done**")
             except discord.Forbidden:
                await self.bot.say("I need Moving Perms to be able to move peeps")
-                return
+            pass
             if user.voice_channel is None:
                 await self.bot.say('{} is not in a voice channel '.format(user.name))
-                return
+            return
 def setup(bot):
     n = move(bot)
     bot.add_cog(n)

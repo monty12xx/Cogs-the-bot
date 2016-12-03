@@ -17,7 +17,7 @@ class move:
         for user in users:
             if user.voice_channel is None:
                 await self.bot.say('{} is not in a voice channel '.format(user.name))
-                pass
+            else:
                 try:
                     await self.bot.move_member(user, channel)
                     await self.bot.say("Moved **{0}** to **__{1}__**".format(user, channel))

@@ -15,16 +15,16 @@ class move:
         """move a user to another voice channel
 		% "channel" @user ,you can move more than a one user or a bunch of users"""
         for user in users:
+            try:
+                await self.bot.move_member(user, channel)
+                await self.bot.say("Moved **{0}** to **__{1}__**".format(user, channel))
+                await asyncio.sleep(1)
+                await self.bot.say("**done**")
+            except discord.Forbidden:
+               await self.bot.say("I need Moving Perms to be able to move peeps")
             if user.voice_channel is None:
                 await self.bot.say('{} is not in a voice channel '.format(user.name))
-                pass
-                try:
-                    await self.bot.move_member(user, channel)
-                    await self.bot.say("Moved **{0}** to **__{1}__**".format(user, channel))
-                    await asyncio.sleep(1)
-                    await self.bot.say("**done**")
-                except discord.Forbidden:
-                        await self.bot.say("I need the moving perms")
+                return
 def setup(bot):
     n = move(bot)
     bot.add_cog(n)

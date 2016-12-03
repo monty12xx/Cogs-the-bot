@@ -25,6 +25,7 @@ class move:
                     await self.bot.say("**done**")
                 except discord.Forbidden:
                         await self.bot.say("I need the moving perms")
+                    return
 def setup(bot):
     n = move(bot)
     bot.add_cog(n)

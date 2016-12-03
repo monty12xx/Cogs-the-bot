@@ -15,17 +15,14 @@ class move:
     async def move(self, ctx, channel: discord.Channel, *users: discord.Member):
         """move a user to another voice channel
 		% "channel" @user ,you can move more than a one user or a bunch of users"""
-        s = ","
-        for user in users:    
+        for user in users:
             try:
                 await self.bot.move_member(user, channel)
-                seq = self.bot.say("Moved **{0}** to **__{1}__**".format(user, channel))
-                await self.bot.say(s.join(seq))
+                await self.bot.say("Moved **{0}** to **__{1}__**".format(user, channel))
                 await asyncio.sleep(1)
                 await self.bot.say("**Done :thumbup::skin-tone-2:**")
             except discord.Forbidden:
                 await self.bot.say("I need the moving perms")
-            return
 
 
 def setup(bot):

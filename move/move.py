@@ -3,12 +3,13 @@ from discord.ext import commands
 from .utils import checks
 import asyncio
 
+
 class move:
     """moves a user from a channel to another one"""
-	
+
     def __init__(self, bot):
         self.bot = bot
-		
+
     @commands.command(pass_context=True)
     @checks.admin_or_permissions(move_members=True)
     async def move(self, ctx, channel: discord.Channel, *users: discord.Member):
@@ -24,8 +25,10 @@ class move:
                     await asyncio.sleep(1)
                     await self.bot.say("**done**")
                 except discord.Forbidden:
-                        await self.bot.say("I need the moving perms")
-                    return
+                    await self.bot.say("I need the moving perms")
+                return
+
+
 def setup(bot):
     n = move(bot)
     bot.add_cog(n)

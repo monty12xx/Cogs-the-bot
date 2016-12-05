@@ -149,18 +149,18 @@
             return msg
 
 
-        @commands.command(pass_context=True)
-        async def shorten(self, ctx, url):
-            payload = {'apikey': "AIzaSyCWHEWGj6JS6l8tJs94TG3QWB_gM_1dCEM", 'provider': "tinyurl_com", 'format': 'html', "url": url}
-            r = requests.get('https://www.googleapis.com/urlshortener/v1/url', params=payload)
-            json1 = r.content
-            json2 = json1.decode("utf-8")
-            if json2 != "Tiny-URL.info : URL is invalid":
-                await self.bot.say("Here you go!" + " " + json2)
-            else:
-                await self.bot.say("Invalid URL!")
+    @commands.command(pass_context=True)
+    async def shorten(self, ctx, url):
+        payload = {'apikey': "AIzaSyCWHEWGj6JS6l8tJs94TG3QWB_gM_1dCEM", 'provider': "tinyurl_com", 'format': 'html', "url": url}
+        r = requests.get('https://www.googleapis.com/urlshortener/v1/url', params=payload)
+        json1 = r.content
+        json2 = json1.decode("utf-8")
+        if json2 != "Tiny-URL.info : URL is invalid":
+            await self.bot.say("Here you go!" + " " + json2)
+        else:
+            await self.bot.say("Invalid URL!")
 
 
-    def setup(bot):
-        n = AdvancedGoogle(bot)
-        bot.add_cog(n)
+def setup(bot):
+    n = AdvancedGoogle(bot)
+    bot.add_cog(n)

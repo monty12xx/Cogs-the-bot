@@ -105,9 +105,9 @@ class Statistics:
                 voice_channels += 1
         channels = text_channels + voice_channels
 
-        em = discord.Embed(description='\a\n', color=discord.Color.red())
+        em = discord.Embed(description="Ping stats: {}ms".format(round((t2-t1)*1000)), color=discord.Color.red())
         avatar = self.bot.user.avatar_url if self.bot.user.avatar else self.bot.user.default_avatar_url
-        em.set_author(name='Statistics of {}'.format(name), description="Ping stats: {}ms".format(round((t2-t1)*1000)), icon_url=avatar)
+        em.set_author(name='Statistics of {}'.format(name),icon_url=avatar)
 
         em.add_field(name='**Uptime**', value=uptime)
         em.add_field(name='**Users**', value=users)

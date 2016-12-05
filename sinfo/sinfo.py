@@ -105,7 +105,7 @@ class Statistics:
                 voice_channels += 1
         channels = text_channels + voice_channels
 
-        em = discord.Embed(description="Ping stats: {}ms".format(round((t2-t1)*1000)), color=discord.Color.red())
+        em = discord.Embed(description='\a\n', color=discord.Color.red())
         avatar = self.bot.user.avatar_url if self.bot.user.avatar else self.bot.user.default_avatar_url
         em.set_author(name='Statistics of {}'.format(name),icon_url=avatar)
 
@@ -125,7 +125,7 @@ class Statistics:
         em.add_field(name='\a', value='\a', inline=False)
         em.add_field(name='**CPU usage**', value='{0:.1f}%'.format(cpu_usage))
         em.add_field(name='**Memory usage**', value='{0:.1f}%'.format(mem_v.percent))
-
+        em.add_field(name="ping stats:", value=round((t2-t1)*1000))
         em.add_field(name='\a', value='\a')
         em.set_footer(text='API version {}'.format(discord.__version__))
         return em

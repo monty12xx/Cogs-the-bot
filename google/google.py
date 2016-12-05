@@ -4,7 +4,7 @@ import aiohttp
 import re
 import urllib
 import requests
-
+import googleapiclient
 
 class AdvancedGoogle:
 
@@ -149,8 +149,9 @@ class AdvancedGoogle:
         return msg
     @commands.command(pass_context=True)
     async def url(self, ctx, url):
-        payload = {'apikey': "AIzaSyCWHEWGj6JS6l8tJs94TG3QWB_gM_1dCEM", 'provider': "goo.gl_com", 'format': 'html', "url": url}
-        r = requests.get('https://www.googleapis.com/urlshortener/v1/url', params=payload)
+        post_url = 'https://www.googleapis.com/urlshortener/v1/url'
+        payload = {'apikey': "AIzaSyCWHEWGj6JS6l8tJs94TG3QWB_gM_1dCEM","longUrl": url}
+        r = requests.post(post_url, data=json.dumps(payload), headers=headers)
         json1 = r.content
         json2 = json1.decode("utf-8")
         if json2 != "Tiny-URL.info : URL is invalid":

@@ -150,10 +150,14 @@ class AdvancedGoogle:
     @commands.command(pass_context=True)
     async def url(self, ctx, url):
         post_url = 'https://www.googleapis.com/urlshortener/v1/url'
-        headers = {'content-type': 'application/json'}
-        payload = {'longUrl': url}
+        payload = {'apikey': "AIzaSyCWHEWGj6JS6l8tJs94TG3QWB_gM_1dCEM","longUrl": url}
         r = requests.post(post_url, data=json.dumps(payload), headers=headers)
-        await self.bot.say("Here you go!" + " " + r.text)
+        json1 = r.content
+        json2 = json1.decode("utf-8")
+        if json2 != "Tiny-URL.info : URL is invalid":
+            await self.bot.say("Here you go!" + " " + json2)
+        else:
+            await self.bot.say("Invalid URL!")
 
 
 

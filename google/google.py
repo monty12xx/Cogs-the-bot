@@ -152,11 +152,7 @@ class AdvancedGoogle:
         payload = {'apikey': "AIzaSyCWHEWGj6JS6l8tJs94TG3QWB_gM_1dCEM","longUrl": url}
         r = requests.post(post_url, data=json.dumps(payload), headers=headers)
         json1 = r.content
-        json2 = json1.decode("utf-8")
-        if json2 != "Tiny-URL.info : URL is invalid":
-            await self.bot.say("Here you go!" + " " + r.text)
-        else:
-            await self.bot.say("Invalid URL!")
+        await self.bot.say("Here you go!" + " " + r.text)
 
 
 

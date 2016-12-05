@@ -3,6 +3,7 @@ from random import choice
 import aiohttp
 import re
 import urllib
+import requests
 
 
 class AdvancedGoogle:
@@ -146,6 +147,18 @@ class AdvancedGoogle:
             sub = re.sub(regex[i], subs[i], msg)
             msg = sub
         return msg
+
+
+    @commands.command(pass_context=True)
+    async def shorten(self, ctx, url):
+        payload = {'apikey': "7A44A58AFDB0D06A787", 'provider': "tinyurl_com", 'format': 'html', "url": url}
+        r = requests.get('http://tiny-url.info/api/v1/create', params=payload)
+        json1 = r.content
+        json2 = json1.decode("utf-8")
+        if json2 != "Tiny-URL.info : URL is invalid":
+            await self.bot.say("Here you go!" + " " + json2)
+        else:
+            await self.bot.say("Invalid URL!")
 
 
 def setup(bot):

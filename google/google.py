@@ -149,9 +149,9 @@ class AdvancedGoogle:
     @commands.command(pass_context=True)
     async def url(self, ctx, url):
         post_url = 'https://www.googleapis.com/urlshortener/v1/url'
-        payload = {'apikey': "AIzaSyCWHEWGj6JS6l8tJs94TG3QWB_gM_1dCEM","longUrl": url}
+        headers = {'content-type': 'application/json'}
+        payload = {'longUrl': url}
         r = requests.post(post_url, data=json.dumps(payload), headers=headers)
-        json1 = r.content
         await self.bot.say("Here you go!" + " " + r.text)
 
 

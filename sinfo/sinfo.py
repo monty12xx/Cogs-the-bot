@@ -1,187 +1,149 @@
-from cogs.utils.dataIO import dataIO
 from discord.ext import commands
-from .utils import checks
-from random import randint
-from .utils.chat_formatting import *
-from random import choice as randchoice
-from __main__ import send_cmd_help
-import datetime
-import asyncio
+from datetime import datetime
 import discord
-import time
-import os
+from .utils import checks
+import aiohttp
+from urllib.parse import parse_qs
+from lxml import etree
 
-try:
-    import psutil
-except:
-    psutil = False
+def date(argument):
+    formats = (
+        '%Y/%m/%d',
+        '%Y-%m-%d',
+    )
 
+    for fmt in formats:
+        try:
+            return datetime.strptime(argument, fmt)
+        except ValueError:
+            continue
 
-class Statistics:
-    """
-    Statistics
-    """
+    raise commands.BadArgument('Cannot convert to date. Expected YYYY/MM/DD or YYYY-MM-DD.')
+
+class Buttons:
+    """Buttons that make you feel."""
+
     def __init__(self, bot):
         self.bot = bot
-        self.settings = dataIO.load_json('data/statistics/settings.json')
-        self.sent_messages = self.settings['SENT_MESSAGES']
-        self.received_messages = self.settings['RECEIVED_MESSAGES']
-        self.refresh_rate = self.settings['REFRESH_RATE']
 
-    async def _int(self, n):
+    @commands.command(hidden=True)
+    async def feelgood(self):
+        """press"""
+        await self.bot.say('*pressed*')
+
+    @commands.command(hidden=True)
+    async def feelbad(self):
+        """depress"""
+        await self.bot.say('*depressed*')
+
+    @commands.command()
+    async def love(self):
+        """What is love?"""
+        await self.bot.say('http://i.imgur.com/JthwtGA.png')
+
+    @commands.command(hidden=True)
+    async def bored(self):
+        """boredom looms"""
+        await self.bot.say('http://i.imgur.com/BuTKSzf.png')
+
+    @commands.command(pass_context=True)
+    @checks.mod_or_permissions(manage_messages=True)
+    async def nostalgia(self, ctx, date: date, *, channel: discord.Channel = None):
+        """Pins an old message from a specific date.
+        If a channel is not given, then pins from the channel the
+        command was ran on.
+        The format of the date must be either YYYY-MM-DD or YYYY/MM/DD.
+        """
+
+        if channel is None:
+            channel = ctx.message.channel
+
+        async for m in self.bot.logs_from(channel, after=date, limit=1):
+            try:
+                await self.bot.pin_message(m)
+            except:
+                await self.bot.say('\N{THUMBS DOWN SIGN} Could not pin message.')
+            else:
+                await self.bot.say('\N{THUMBS UP SIGN} Successfully pinned message.')
+
+    @nostalgia.error
+    async def nostalgia_error(self, error, ctx):
+        if type(error) is commands.BadArgument:
+            await self.bot.say(error)
+
+    async def get_google_entries(self, query):
+        params = {
+            'q': query,
+            'safe': 'on'
+        }
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64)'
+        }
+
+        # list of URLs
+        entries = []
+
+        async with aiohttp.get('https://www.google.com/search', params=params, headers=headers) as resp:
+            if resp.status != 200:
+                raise RuntimeError('Google somehow failed to respond.')
+
+            root = etree.fromstring(await resp.text(), etree.HTMLParser())
+
+            """
+            Tree looks like this.. sort of..
+            <div class="g">
+                ...
+                <h3>
+                    <a href="/url?q=<url>" ...>title</a>
+                </h3>
+                ...
+                <span class="st">
+                    <span class="f">date here</span>
+                    summary here, can contain <em>tag</em>
+                </span>
+            </div>
+            """
+
+            search_nodes = root.findall(".//div[@class='g']")
+            for node in search_nodes:
+                url_node = node.find('.//h3/a')
+                if url_node is None:
+                    continue
+
+                url = url_node.attrib['href']
+                if not url.startswith('/url?'):
+                    continue
+
+                url = parse_qs(url[5:])['q'][0] # get the URL from ?q query string
+
+                # if I ever cared about the description, this is how
+                entries.append(url)
+
+                # short = node.find(".//span[@class='st']")
+                # if short is None:
+                #     entries.append((url, ''))
+                # else:
+                #     text = ''.join(short.itertext())
+                #     entries.append((url, text.replace('...', '')))
+
+        return entries
+
+    @commands.command(aliases=['google'])
+    async def g(self, *, query):
+        """Searches google and gives you top result."""
         try:
-            int(n)
-            return True
-        except ValueError:
-            return False
-
-    @commands.command()
-    async def stats(self):
-        """
-        Retreive statistics
-        """
-        message = await self.retrieve_statistics()
-        await self.bot.say(embed=message)
-
-    @commands.command()
-    async def statsrefresh(self, seconds: int):
-        """
-        Set the refresh rate by which the statistics are updated
-
-        Example: [p]statsrefresh 42
-
-        Default: 5
-        """
-        if await self._int(seconds):
-            if seconds < 5:
-                message = '`I can\'t do that, the refresh rate has to be above 5 seconds`'
-            else:
-                self.refresh_rate = seconds
-                self.settings['REFRESH_RATE'] = self.refresh_rate
-                dataIO.save_json('data/statistics/settings.json', self.settings)
-                message = '`Changed refresh rate to {} seconds`'.format(self.refresh_rate)
-        await self.bot.say(message)
-
-    @commands.command(no_pm=True)
-    @checks.serverowner_or_permissions(manage_server=True)
-    async def statschannel(self, *channel: discord.Channel):
-        """
-        Set the channel to which the bot will sent its continues updates.
-        Example: [p]statschannel #statistics
-        """
-        if len(channel) > 0:
-            self.settings['CHANNEL_ID'] = str(channel[0].id)
-            dataIO.save_json('data/statistics/settings.json', self.settings)
-            message = 'Channel set to {}'.format(channel[0].mention)
-        elif not self.settings['CHANNEL_ID']:
-            message = 'No channel set!'
+            entries = await self.get_google_entries(query)
+        except RuntimeError as e:
+            await self.bot.say(str(e))
         else:
-            channel = discord.utils.get(self.bot.get_all_channels(), id=self.settings['CHANNEL_ID'])
-            message = 'Current channel is {}'.format(channel.mention)
-        await self.bot.say(message)
-
-    async def retrieve_statistics(self):
-        name = self.bot.user.name
-        now = datetime.datetime.now()
-        uptime = (now - self.bot.uptime).seconds
-        uptime = datetime.timedelta(seconds=uptime)
-        users = str(len(set(self.bot.get_all_members())))
-        servers = str(len(self.bot.servers))
-        text_channels = 0
-        voice_channels = 0
-        t1 = time.perf_counter()
-        t2 = time.perf_counter()
-
-
-        cpu_p = psutil.cpu_percent(interval=None, percpu=True)
-        cpu_usage = sum(cpu_p)/len(cpu_p)
-
-        mem_v = psutil.virtual_memory()
-
-        for channel in self.bot.get_all_channels():
-            if channel.type == discord.ChannelType.text:
-                text_channels += 1
-            elif channel.type == discord.ChannelType.voice:
-                voice_channels += 1
-        channels = text_channels + voice_channels
-
-        em = discord.Embed(description='\a\n', color=discord.Color.red())
-        avatar = self.bot.user.avatar_url if self.bot.user.avatar else self.bot.user.default_avatar_url
-        em.set_author(name='Statistics of {}'.format(name),icon_url=avatar)
-
-        em.add_field(name='**Uptime**', value=uptime)
-        em.add_field(name='**Users**', value=users)
-        em.add_field(name='**Servers**', value=servers)
-
-        em.add_field(name='**Channels**', value=str(channels))
-        em.add_field(name='**Text channels**', value=str(text_channels))
-        em.add_field(name='**Voice channels**', value=str(voice_channels))
-
-        em.add_field(name='**Messages received**', value=str(self.received_messages))
-        em.add_field(name='**Messages sent**', value=str(self.sent_messages))
-        em.add_field(name='\a', value='\a')
-        em.add_field(name='\a', value='\a')
-
-        em.add_field(name='\a', value='\a', inline=False)
-        em.add_field(name='**CPU usage**', value='{0:.1f}%'.format(cpu_usage))
-        em.add_field(name='**Memory usage**', value='{0:.1f}%'.format(mem_v.percent))
-        em.add_field(name="ping stats:", value=round((t2-t1)*1000))
-        em.add_field(name='\a', value='\a')
-        em.set_footer(text='API version {}'.format(discord.__version__))
-        return em
-
-    async def incoming_messages(self, message):
-        if message.author.id == self.bot.user.id:
-            self.sent_messages += 1
-        else:
-            self.received_messages += 1
-        self.settings['SENT_MESSAGES'] = self.sent_messages
-        self.settings['RECEIVED_MESSAGES'] = self.received_messages
-        dataIO.save_json('data/statistics/settings.json', self.settings)
-
-    async def reload_stats(self):
-        await asyncio.sleep(30)
-        while self == self.bot.get_cog('Statistics'):
-            if self.settings['CHANNEL_ID']:
-                msg = await self.retrieve_statistics()
-                channel = discord.utils.get(self.bot.get_all_channels(), id=self.settings['CHANNEL_ID'])
-                messages = False
-                async for message in self.bot.logs_from(channel, limit=1):
-                    messages = True
-                    if message.author.name == self.bot.user.name:
-                        await self.bot.edit_message(message, embed=msg)
-                if not messages:
-                    await self.bot.send_message(channel, embed=msg)
+            next_two = entries[1:3]
+            if next_two:
+                formatted = '\n'.join(map(lambda x: '<%s>' % x, next_two))
+                msg = '{}\n\n**See also:**\n{}'.format(entries[0], formatted)
             else:
-                pass
-            await asyncio.sleep(self.refresh_rate)
+                msg = entries[0]
 
-
-def check_folder():
-    if not os.path.exists("data/statistics"):
-        print("Creating data/statistics folder...")
-        os.makedirs("data/statistics")
-
-
-def check_file():
-    data = {}
-    data['CHANNEL_ID'] = ''
-    data['SENT_MESSAGES'] = 0
-    data['RECEIVED_MESSAGES'] = 0
-    data['REFRESH_RATE'] = 5
-    f = "data/statistics/settings.json"
-    if not dataIO.is_valid_json(f):
-        print("Creating default settings.json...")
-        dataIO.save_json(f, data)
-
+            await self.bot.say(msg)
 
 def setup(bot):
-    if psutil is False:
-        raise RuntimeError("psutil is not installed. Do 'pip3 install psutil --upgrade' to use this cog.")
-    else:
-        check_folder()
-        check_file()
-        n = Statistics(bot)
-        bot.add_cog(n)
-        bot.add_listener(n.incoming_messages, "on_message")
-        bot.loop.create_task(n.reload_stats())
+    bot.add_cog(Buttons(bot))

@@ -34,7 +34,7 @@ class pogo:
             raise commands.CheckFailure
 
         await self.bot.add_roles(user, role)
-        await self.bot.say('Added role {} to {}'.format(role.name, user.name))
+        await self.bot.say('Added user to team {} to {}'.format(role.name, user.name))
 
 def setup(bot):
     n = pogo(bot)

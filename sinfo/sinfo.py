@@ -128,8 +128,8 @@ class Buttons:
 
         return entries
 
-    @commands.command(aliases=['google'])
-    async def go(self, *, query):
+    @commands.command(aliases=['go'])
+    async def g(self, *, query):
         """Searches google and gives you top result."""
         try:
             entries = await self.get_google_entries(query)

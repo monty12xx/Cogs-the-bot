@@ -1,5 +1,14 @@
 import discord
 from discord.ext import commands
+import discord
+from discord.ext import commands
+from cogs.utils import checks
+from cogs.utils.dataIO import dataIO
+from __main__ import settings, send_cmd_help
+from copy import deepcopy
+import asyncio
+import logging
+import os
 
 
 class pogo:

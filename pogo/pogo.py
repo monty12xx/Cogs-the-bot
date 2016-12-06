@@ -10,6 +10,7 @@ import asyncio
 import logging
 import os
 
+og = logging.getLogger("red.admin")
 
 class pogo:
     def __init__(self, bot):

@@ -15,7 +15,7 @@ class Verification():
     self.cursor = bot.mysql.cursor
 
   @commands.group(pass_context=True, aliases=['onjoinverify', 'approval'], invoke_without_command=True)
-  @checks.admin_or_perm(manage_server=True)
+  @checks.serverowner_or_permissions(administrator=True)
   async def verification(self, ctx, channel:discord.Channel=None, *, mentions:str=None):
     if ctx.message.server.me.permissions_in(ctx.message.channel).manage_roles == False and ctx.message.server.me.permissions_in(ctx.message.channel).manage_channels == False:
       if ctx.message.server.me.permissions_in(ctx.message.channel).administrator == False:
@@ -78,7 +78,7 @@ class Verification():
       await self.bot.say(":negative_squared_cross_mark: **Disabled** user approval on join")
 
   @verification.command(name='mention', aliases=['mentions'], pass_context=True, invoke_without_command=True)
-  @checks.admin_or_perm(manage_server=True)
+  @checks.serverowner_or_permissions(administrator=True)
   async def verification_mention(self, ctx, *mentions:str):
     if ctx.message.server.me.permissions_in(ctx.message.channel).manage_roles == False and ctx.message.server.me.permissions_in(ctx.message.channel).manage_channels == False:
       if ctx.message.server.me.permissions_in(ctx.message.channel).administrator == False:
@@ -129,7 +129,7 @@ class Verification():
         await self.bot.say(":white_check_mark: Set `{0}` to be mentioned on user join for approval".format(', '.join(mention_names)))
 
   @commands.group(pass_context=True, invoke_without_command=True)
-  @checks.mod_or_perm(manage_server=True)
+  @checks.serverowner_or_permissions(administrator=True)
   async def verify(self, ctx, *users:str):
     if ctx.message.server.me.permissions_in(ctx.message.channel).manage_roles == False and ctx.message.server.me.permissions_in(ctx.message.channel).manage_channels == False:
       if ctx.message.server.me.permissions_in(ctx.message.channel).administrator == False:

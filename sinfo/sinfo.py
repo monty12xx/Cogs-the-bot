@@ -11,7 +11,7 @@ class Welcome(): #Allow to welcome new members who join server. If it enable, wi
 
     async def on_member_join(self,member):
         if await self.redis.hget("{}:Config:Cogs".format(member.server.id),"welcome") == "on":
-            config = await self.redis.hgetall("{}:Welcome:Message".format(member.server.id))
+            config = await self.redis.hgetall("{}:Welcome to {} enjoy your stay".format(author.mention, server.name))
             try:
                 if config.get("enable_message") == "on":
                     if config.get("whisper") == "on":

@@ -3,7 +3,7 @@ import asyncio
 import pymysql
 import random
 from discord.ext import commands
-from utils import checks
+from .utils import checks
 
 cool = "```xl\n{0}\n```"
 code = "```py\n{0}\n```"

@@ -359,14 +359,14 @@ class General:
         data = discord.Embed(
             description="Server ID: " + server.id,
             colour=discord.Colour(value=colour))
+        data.add_field(name="Owner", value=str(server.owner))
         data.add_field(name="Region", value=str(server.region))
         data.add_field(name="Users", value="{}/{}".format(online, total_users))
         data.add_field(name="Text Channels", value=text_channels)
         data.add_field(name="Voice Channels", value=voice_channels)
         data.add_field(name="Roles", value=len(server.roles))
-        data.add_field(name="Owner", value=str(server.owner))
         data.add_field(name="Created At", value=created_at)
-        data.set_footer(text="server info || {}".format(ctx.message.timestamp))
+        data.set_footer(text="this is  {} old".format(passed))
         if server.icon_url:
             data.set_author(name=server.name, url=server.icon_url)
             data.set_thumbnail(url=server.icon_url)

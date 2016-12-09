@@ -366,7 +366,7 @@ class General:
         data.add_field(name="Voice Channels", value=voice_channels)
         data.add_field(name="Roles", value=len(server.roles))
         data.add_field(name="Created At", value=created_at)
-        data.set_footer(text="this is {} old".format(created_at))
+        data.set_footer(text="Server information")
         if server.icon_url:
             data.set_author(name=server.name, url=server.icon_url)
             data.set_thumbnail(url=server.icon_url)

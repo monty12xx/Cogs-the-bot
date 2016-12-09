@@ -13,7 +13,7 @@ class prefix:
         """setup bot roles.."""
         author = ctx.message.author
         server = ctx.message.server
-        p = self.bot.settings.get_prefixes(message.server)
+        p = ("%")
         await self.bot.say("{} my prefixes is{}".format(author.mention, p))
 
 

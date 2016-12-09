@@ -7,7 +7,7 @@ class inrole:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.commad(pass_context=True)
+    @commands.command(pass_context=True)
     async def role(self, ctx, *, rolename):
         """show how much users in the role"""
         channel = ctx.message.channel

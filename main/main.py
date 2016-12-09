@@ -366,6 +366,7 @@ class General:
         data.add_field(name="Voice Channels", value=voice_channels)
         data.add_field(name="Roles", value=len(server.roles))
         data.add_field(name="Created At", value=created_at)
+        data.add_field(name="Verification level", value=str(server.verification_level).upper())
         data.set_footer(text="Server information")
         if server.icon_url:
             data.set_author(name=server.name, url=server.icon_url)

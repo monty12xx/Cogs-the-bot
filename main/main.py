@@ -368,7 +368,7 @@ class General:
         data.add_field(name="Created At", value=created_at)
         data.set_footer(text="server info || {}".format(ctx.message.timestamp))
         if server.icon_url:
-            data.set_author(name=server.name + server.owner, url=server.icon_url)
+            data.set_author(name=server.name, url=server.icon_url)
             data.set_thumbnail(url=server.icon_url)
         else:
             data.set_author(name=server.name)

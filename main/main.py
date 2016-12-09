@@ -368,8 +368,8 @@ class General:
         data.add_field(name="Created At", value=created_at)
         data.set_footer(text="server info || {}".format(ctx.message.timestamp))
         if server.icon_url:
-            data.set_author(name=server.name, url=server.icon_url)
-            data.set_image(url=server.icon_url)
+            data.set_author(name=server.name + server.owner, url=server.icon_url)
+            data.set_thumbnail(url=server.icon_url)
         else:
             data.set_author(name=server.name)
 
@@ -413,9 +413,7 @@ class General:
                                                  example))
                 msg = pagify(msg, ["\n"])
                 for page in msg:
-                    em = discord.Embed(colour=discord.Colour(value=colour))
-                    data.add_field(name="_\n_", value=msg)
-                    data.add_field(name="your urban", value=page)
+                    em = discord.Embed(description=page, colour=discord.Colour(value=colour))
                     em.set_footer(text="Your Urban", icon_url='https://cdn3.iconfinder.com/data/icons/education-and-school/512/building_house_architecture_estate_flat_icon-512.png')
                     await self.bot.say(embed=em)
                 

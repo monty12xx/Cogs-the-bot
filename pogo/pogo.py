@@ -31,6 +31,7 @@ class youtube:
             colour = ''.join([choice('0123456789ABCDEF') for x in range(6)])
             colour = int(colour, 16)
             em = discord.Embed(colour=discord.Colour(value=colour))
+            em.add_field(name="youtuber", value=channeln)
             em.add_field(name="Views:", value=viewcount)
             em.add_field(name="Subscribers:", value=subscount)
             em.add_field(name="Videos:", value=videocount)

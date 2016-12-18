@@ -26,6 +26,7 @@ class userstats:
         em.add_field(name="Online users:", value=Online)
         em.add_field(name="Offline users:", value=offline)
         em.add_field(name="Other users:", value=others)
+        await bot.say(embed=em)
 
 def setup(bot):
     n = userstats

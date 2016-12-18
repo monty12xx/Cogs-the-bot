@@ -1243,6 +1243,10 @@ class Audio:
             await self.bot.say("Nothing playing, nothing to pause.")
     @commands.command(pass_context=True, no_pm=True)
     async def summon(self, ctx):
+        url = url_or_search_terms
+        server = ctx.message.server
+        author = ctx.message.author
+        voice_channel = author.voice_channel
         if self.is_playing(server):
             await ctx.invoke(self._queue, url=url)
             return  # Default to queue

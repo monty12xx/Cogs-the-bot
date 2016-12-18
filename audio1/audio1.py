@@ -1248,6 +1248,7 @@ class Audio:
         voice_channel = author.voice_channel
         if not author.voice_channel:
             await self.bot.say("you're not in voice channel")
+            return
         if not self.voice_connected(server):
             await self._join_voice_channel(voice_channel)
         else:  # We are connected but not to the right channel

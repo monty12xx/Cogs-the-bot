@@ -1247,6 +1247,12 @@ class Audio:
         author = ctx.message.author
         server = ctx.message.server
         voice_channel = author.voice_channel
+        try:
+            await self.bot.join_voice_channel(ctx.message.author.voice_channel)
+            await self.bot.say(":inbox_tray: **Im In** :thumbsup:")
+        except discord.ClientException:
+            await self.bot.say("The bot is already in a voice channel")
+
 
         if voice_channel is not None:
             self._stop(server)
@@ -1255,12 +1261,6 @@ class Audio:
             await self.bot.say(":anger: You are not in a "
                                " **VOICE CHANNEL** :rage:")
             return
-
-        try:
-            await self.bot.join_voice_channel(ctx.message.author.voice_channel)
-            await self.bot.say(":inbox_tray: **Im In** :thumbsup:")
-        except discord.ClientException:
-            await self.bot.say("The bot is already in a voice channel")
 
 
     @commands.command(pass_context=True, no_pm=True)

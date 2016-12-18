@@ -1294,9 +1294,8 @@ class Audio:
             return
         if server.id not in self.players:
             if not create:
-                raise exceptions.CommandError(
-                    'The bot is not in a voice channel.  '
-                    'Use %ssummon to summon it to your voice channel.' % self.config.command_prefix)
+                await self.bot.say("**The bot is not summoned !! use %summon")
+
         if "." in url:
             if not self._valid_playable_url(url):
                 await self.bot.say("That's not a valid URL.")

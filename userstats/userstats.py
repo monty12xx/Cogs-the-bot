@@ -12,7 +12,6 @@ class userstats:
     async def userstats(self, ctx):
         """Gives My Server Statistics"""
         author = ctx.message.author
-
         colour = ''.join([choice('0123456789ABCDEF') for x in range(6)])
         colour = int(colour, 16)
         Online = len([e for e in self.bot.get_all_members() if e.status == discord.Status.online])

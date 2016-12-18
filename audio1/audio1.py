@@ -1241,7 +1241,7 @@ class Audio:
             await self.bot.say("Paused.")
         else:
             await self.bot.say("Nothing playing, nothing to pause.")
-    @commands.commad(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=True)
     async def summon(self, ctx):
         if self.is_playing(server):
             await ctx.invoke(self._queue, url=url)
@@ -1253,8 +1253,8 @@ class Audio:
                 await self._stop_and_disconnect(server)
                 await self._join_voice_channel(voice_channel)
         await self.bot.say("summoned!")
-                
-        
+
+
     @commands.command(pass_context=True, no_pm=True)
     async def play(self, ctx, *, url_or_search_terms):
         """Plays a link / searches and play"""

@@ -1248,16 +1248,14 @@ class Audio:
         voice_channel = author.voice_channel
         if not author.voice_channel:
             await self.bot.say("you're not in voice channel")
+            return
         if not self.voice_connected(server):
             await self._join_voice_channel(voice_channel)
         else:  # We are connected but not to the right channel
-            try:
-                if self.voice_client(server).channel != voice_channel:                
-                    await self._stop_and_disconnect(server)
-                    await self._join_voice_channel(voice_channel)
-                    await self.bot.say("summoned!")
-            except discord.ClientException:
-                await self.bot.say("already in a voice channel !!")
+            if self.voice_client(server).channel != voice_channel:
+                await self._stop_and_disconnect(server)
+                await self._join_voice_channel(voice_channel)
+        await self.bot.say("summoned!")
 
 
     @commands.command(pass_context=True, no_pm=True)

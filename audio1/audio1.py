@@ -1257,10 +1257,7 @@ class Audio:
         if voice_channel is not None:
             self._stop(server)
 
-        if voice_channel is None:
-            await self.bot.say(":anger: You are not in a "
-                               " **VOICE CHANNEL** :rage:")
-            return
+
 
 
     @commands.command(pass_context=True, no_pm=True)

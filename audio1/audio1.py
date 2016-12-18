@@ -1256,11 +1256,11 @@ class Audio:
                                " **VOICE CHANNEL** :rage:")
             return
         try:
-            await self._join_voice_channel(voice_channel)
+            await self._join_voice_channel(author, voice_channel)
             await self.bot.say(":inbox_tray: **Im In** :thumbsup:")
         except discord.ClientException:
-            await self.bot.say("already in your voice channel :anger:")
-            
+            await self.bot.say("already in a voice channel :anger:")
+
 
 
     @commands.command(pass_context=True, no_pm=True)

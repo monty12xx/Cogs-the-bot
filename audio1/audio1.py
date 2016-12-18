@@ -1251,7 +1251,7 @@ class Audio:
             if self.voice_client(server).channel != voice_channel:
                 await self._stop_and_disconnect(server)
                 await self._join_voice_channel(voice_channel)
-        await self.bot.say("summoned"
+        await self.bot.say("summoned")
 
 
     @commands.command(pass_context=True, no_pm=True)

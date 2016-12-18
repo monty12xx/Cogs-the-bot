@@ -1248,14 +1248,16 @@ class Audio:
         voice_channel = author.voice_channel
         if not author.voice_channel:
             await self.bot.say("you're not in voice channel")
-            return
         if not self.voice_connected(server):
             await self._join_voice_channel(voice_channel)
         else:  # We are connected but not to the right channel
-            if self.voice_client(server).channel != voice_channel:
-                await self._stop_and_disconnect(server)
-                await self._join_voice_channel(voice_channel)
-        await self.bot.say("summoned!")
+            try:
+                if self.voice_client(server).channel != voice_channel:                
+                    await self._stop_and_disconnect(server)
+                    await self._join_voice_channel(voice_channel)
+                    await self.bot.say("summoned!")
+            except discord.ClientException:
+                await self.bot.say("already in a voice channel !!")
 
 
     @commands.command(pass_context=True, no_pm=True)
@@ -1265,25 +1267,9 @@ class Audio:
         server = ctx.message.server
         author = ctx.message.author
         voice_channel = author.voice_channel
-        urls = []
-        added = 0
+
         # Checking if playing in current server
-        for url in urls:
-            # noinspection PyBroadException
-            try:
-                info = self.get_url_info(url)
-                title = info["title"]
-                author = info["uploader"]
-                assembled_queue = {"url": url, "song_owner": ctx.message.author, "title": title, "author": author}
-                self.queues[ctx.message.server.id].append(assembled_queue)
-                added += 1
-                placeholder_msg = await self.bot.edit_message(placeholder_msg,
-                                                              "Successfully added {1} - {0} to the queue!"
-                                                              .format(title, author))
-                await asyncio.sleep(1)
-            except:
-                await self.bot.say("Unable to add <{0}> to the queue. Skipping.".format(url))
-        await self.bot.say("Added {0} tracks to the queue.".format(added))
+
         if self.is_playing(server):
             await ctx.invoke(self._queue, url=url)
             return  # Default to queue

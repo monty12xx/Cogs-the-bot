@@ -1265,7 +1265,7 @@ class Audio:
         server = ctx.message.server
         author = ctx.message.author
         voice_channel = author.voice_channel
-
+        urls = []
         # Checking if playing in current server
         for url in urls:
             # noinspection PyBroadException

@@ -399,6 +399,7 @@ class Audio:
 
         await voice_client.disconnect()
         await self.bot.say("disconnected")
+        return
 
     async def _download_all(self, url_list):
         """
@@ -1256,6 +1257,7 @@ class Audio:
                 await self._stop_and_disconnect(server)
                 await self._join_voice_channel(voice_channel)
         await self.bot.say("summoned!")
+        return
 
 
     @commands.command(pass_context=True, no_pm=True)

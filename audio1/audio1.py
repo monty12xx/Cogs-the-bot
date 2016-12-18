@@ -1241,7 +1241,7 @@ class Audio:
             await self.bot.say("Paused.")
         else:
             await self.bot.say("Nothing playing, nothing to pause.")
-    @commands.commad(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=True)
     async def summon(self, ctx):
         """Joins your voice channel"""
         author = ctx.message.author

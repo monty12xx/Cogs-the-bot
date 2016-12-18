@@ -1243,24 +1243,19 @@ class Audio:
             await self.bot.say("Nothing playing, nothing to pause.")
     @commands.command(pass_context=True, no_pm=True)
     async def summon(self, ctx):
-        """Joins your voice channel"""
-        author = ctx.message.author
         server = ctx.message.server
+        author = ctx.message.author
         voice_channel = author.voice_channel
-
-        if voice_channel is not None:
-            self._stop(server)
-
-        if voice_channel is None:
-            await self.bot.say(":anger: You are not in a "
-                               " **VOICE CHANNEL** :rage:")
+        if not author.voice_channel:
+            await self.bot.say("you're not in voice channel")
             return
-        try:
-            await self._join_voice_channel(author.voice_channel)
-            await self.bot.say(":inbox_tray: **Im In** :thumbsup:")
-        except discord.ClientException:
-            await self.bot.say("already in a voice channel :anger:")
-
+        if not self.voice_connected(server):
+            await self._join_voice_channel(voice_channel)
+        else:  # We are connected but not to the right channel
+            if self.voice_client(server).channel != voice_channel:
+                await self._stop_and_disconnect(server)
+                await self._join_voice_channel(voice_channel)
+        await self.bot.say("summoned!")
 
 
     @commands.command(pass_context=True, no_pm=True)

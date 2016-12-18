@@ -1240,7 +1240,7 @@ class Audio:
             await self.bot.say("Paused.")
         else:
             await self.bot.say("Nothing playing, nothing to pause.")
-    @commands.commad(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=True)
     async def summon(self, ctx):
         if self.is_playing(server):
             await ctx.invoke(self._queue, url=url)

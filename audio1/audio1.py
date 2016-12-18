@@ -1166,7 +1166,32 @@ class Audio:
         voice_channel = author.voice_channel
 
         # Checking already connected, will join if not
-
+        song = self._get_queue_nowplaying(server)
+        if song:
+            if not hasattr(song, 'creator'):
+                song.creator = None
+            if not hasattr(song, 'view_count'):
+                song.view_count = None
+            if not hasattr(song, 'uploader'):
+                song.uploader = None
+            if hasattr(song, 'duration'):
+                m, s = divmod(song.duration, 60)
+                h, m = divmod(m, 60)
+                if h:
+                    dur = "{0}:{1:0>2}:{2:0>2}".format(h, m, s)
+                else:
+                    dur = "{0}:{1:0>2}".format(m, s)
+            else:
+                dur = None
+            msg = ("\n**Title:** {}\n**Author:** {}\n**Uploader:** {}\n"
+                   "**Views:** {}\n**Duration:** {}\n\n<{}>".format(
+                       song.title, song.creator, song.uploader,
+                       song.view_count, dur, song.webpage_url))
+            await self.bot.say(msg.replace("**Author:** None\n", "")
+                                  .replace("**Views:** None\n", "")
+                                  .replace("**Uploader:** None\n", "")
+                                  .replace("**Duration:** None\n", ""))
+            return
         if not self.voice_connected(server):
             try:
                 self.has_connect_perm(author, server)

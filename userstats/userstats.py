@@ -17,9 +17,9 @@ class userstats:
         msg = "I am in **{}** Servers\n".format(len(self.bot.servers))
         Online = "<:vpOnline:212789758110334977> Members: {}\n".format(
             len([e for e in self.bot.get_all_members() if e.status == discord.Status.online]))
-        offline += "<:vpOffline:212790005943369728> Members: {}\n".format(
+        offline = "<:vpOffline:212790005943369728> Members: {}\n".format(
             len([e for e in self.bot.get_all_members() if e.status == discord.Status.offline]))
-        others += "<:vpDnD:236744731088912384> | <:vpAway:212789859071426561> Members: {}\n".format(
+        others = "<:vpDnD:236744731088912384> | <:vpAway:212789859071426561> Members: {}\n".format(
             len([e for e in self.bot.get_all_members() if e.status in [discord.Status.idle, discord.Status.dnd]]))
         em = discord.Embed(title=msg, colour=discord.Colour(value=colour))
         em.set_author(name="I am in **{}** Servers\n".format(len(self.bot.servers)), icon_url=author.avatar)

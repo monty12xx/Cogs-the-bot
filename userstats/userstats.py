@@ -11,6 +11,7 @@ class userstats:
     @commands.command(pass_context=True)
     async def userstats(self, ctx):
         """Gives My Server Statistics"""
+        author = ctx.message.author
 
         colour = ''.join([choice('0123456789ABCDEF') for x in range(6)])
         colour = int(colour, 16)

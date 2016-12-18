@@ -398,6 +398,7 @@ class Audio:
         voice_client = self.voice_client(server)
 
         await voice_client.disconnect()
+        await bot.say("disconnected")
 
     async def _download_all(self, url_list):
         """
@@ -1240,7 +1241,20 @@ class Audio:
             await self.bot.say("Paused.")
         else:
             await self.bot.say("Nothing playing, nothing to pause.")
-
+    @commands.commad(pass_context=True, no_pm=True)
+    async def summon(self, ctx):
+        if self.is_playing(server):
+            await ctx.invoke(self._queue, url=url)
+            return  # Default to queue
+        if not self.voice_connected(server):
+            await self._join_voice_channel(voice_channel)
+        else:  # We are connected but not to the right channel
+            if self.voice_client(server).channel != voice_channel:
+                await self._stop_and_disconnect(server)
+                await self._join_voice_channel(voice_channel)
+        await self.bot.say("summoned!")
+                
+        
     @commands.command(pass_context=True, no_pm=True)
     async def play(self, ctx, *, url_or_search_terms):
         """Plays a link / searches and play"""
@@ -1271,13 +1285,6 @@ class Audio:
             await self.bot.say("I don't have permissions to speak in your"
                                " voice channel.")
             return
-
-        if not self.voice_connected(server):
-            await self._join_voice_channel(voice_channel)
-        else:  # We are connected but not to the right channel
-            if self.voice_client(server).channel != voice_channel:
-                await self._stop_and_disconnect(server)
-                await self._join_voice_channel(voice_channel)
 
         # If not playing, spawn a downloader if it doesn't exist and begin
         #   downloading the next song

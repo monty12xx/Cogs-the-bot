@@ -1292,9 +1292,9 @@ class Audio:
         if self.currently_downloading(server):
             await self.bot.say("I'm already downloading a file!")
             return
-        if server.id not in self.players:
-            if not create:
-                await self.bot.say("**The bot is not summoned !! use %summon")
+        if voice_channel is None:
+            await self.bot.say("the bot isn't summoned use %summon to summon it")
+            return
 
         if "." in url:
             if not self._valid_playable_url(url):

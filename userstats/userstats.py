@@ -29,5 +29,5 @@ class userstats:
         await bot.say(embed=em)
 
 def setup(bot):
-    n = userstats
+    n = userstats(bot)
     bot.add_cog(n)

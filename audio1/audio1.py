@@ -1292,7 +1292,7 @@ class Audio:
         if self.currently_downloading(server):
             await self.bot.say("I'm already downloading a file!")
             return
-        if voice_channel is None:
+        if not in voice_channel:
             await self.bot.say("the bot isn't summoned use %summon to summon it")
             return
 

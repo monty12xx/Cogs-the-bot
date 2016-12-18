@@ -1191,6 +1191,7 @@ class Audio:
                                   .replace("**Views:** None\n", "")
                                   .replace("**Uploader:** None\n", "")
                                   .replace("**Duration:** None\n", ""))
+            await self.bot.say(song)
             return
         if not self.voice_connected(server):
             try:

@@ -1243,6 +1243,8 @@ class Audio:
     @commands.command(pass_context=True, no_pm=True)
     async def summon(self, ctx):
         server = ctx.message.server
+        author = ctx.message.author
+        voice_channel = author.voice_channel
         if self.is_playing(server):
             await ctx.invoke(self._queue, url=url)
             return  # Default to queue

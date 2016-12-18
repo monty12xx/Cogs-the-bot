@@ -398,7 +398,7 @@ class Audio:
         voice_client = self.voice_client(server)
 
         await voice_client.disconnect()
-        await bot.say("disconnected")
+        await self.bot.say("disconnected")
 
     async def _download_all(self, url_list):
         """

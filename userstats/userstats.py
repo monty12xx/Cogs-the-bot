@@ -17,7 +17,8 @@ class userstats:
             len([e for e in self.bot.get_all_members() if e.status == discord.Status.offline]))
         msg += "<:vpDnD:236744731088912384> | <:vpAway:212789859071426561> Members: {}\n".format(
             len([e for e in self.bot.get_all_members() if e.status in [discord.Status.idle, discord.Status.dnd]]))
-        await self.bot.say(msg)
+        em = discord.Embed(title=msg, color=discord.Color.blue())
+        await self.bot.say(embed=em)
 
 def setup(bot):
     n = userstats(bot)

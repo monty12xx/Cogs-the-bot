@@ -1246,6 +1246,8 @@ class Audio:
         server = ctx.message.server
         author = ctx.message.author
         voice_channel = author.voice_channel
+        if not author.voice_channel:
+            await self.bot.say("you're not in voice channel")
         if not self.voice_connected(server):
             await self._join_voice_channel(voice_channel)
         else:  # We are connected but not to the right channel
@@ -1291,9 +1293,6 @@ class Audio:
 
         if self.currently_downloading(server):
             await self.bot.say("I'm already downloading a file!")
-            return
-        if not in voice_channel:
-            await self.bot.say("the bot isn't summoned use %summon to summon it")
             return
 
         if "." in url:

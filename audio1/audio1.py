@@ -1257,7 +1257,7 @@ class Audio:
             return
 
         try:
-            await ctx.message.author.voice_channel.join_voice.channel()
+            await self.bot.join_voice_channel(author)
             await self.bot.say(":inbox_tray: **Im In** :thumbsup:")
         except discord.ClientException:
             await self.bot.say("The bot is already in a voice channel")

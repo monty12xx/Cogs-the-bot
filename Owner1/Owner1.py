@@ -4,7 +4,8 @@ from cogs.utils import checks
 from __main__ import set_cog, send_cmd_help, settings
 from .utils.dataIO import dataIO
 from .utils.chat_formatting import pagify, box
-
+from random import randint
+from random import choice as randchoice
 import importlib
 import traceback
 import logging

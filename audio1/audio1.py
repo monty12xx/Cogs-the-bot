@@ -1251,7 +1251,7 @@ class Audio:
         song = self._get_queue_nowplaying(server)
 
         # Checking if playing in current server
-        await self.bot.say("Added {} to the queue".format(song))
+        await self.bot.say("Added {} to the queue".format(self.song.title))
 
         if self.is_playing(server):
             await ctx.invoke(self._queue, url=url)

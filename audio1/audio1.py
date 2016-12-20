@@ -1248,9 +1248,10 @@ class Audio:
         server = ctx.message.server
         author = ctx.message.author
         voice_channel = author.voice_channel
+        song = self._get_queue_nowplaying(server)
 
         # Checking if playing in current server
-        await self.bot.say("Added {} to the queue".format(self.song.title))
+        await self.bot.say("Added {} to the queue".format(song.title))
 
         if self.is_playing(server):
             await ctx.invoke(self._queue, url=url)

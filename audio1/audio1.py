@@ -6,7 +6,6 @@ from random import shuffle, choice
 from cogs.utils.dataIO import dataIO
 from cogs.utils import checks
 from __main__ import send_cmd_help, settings
-from json import JSONDecodeError
 import re
 import logging
 import collections
@@ -123,7 +122,7 @@ class Song:
         self.id = kwargs.pop('id', None)
         self.url = kwargs.pop('url', None)
         self.webpage_url = kwargs.pop('webpage_url', "")
-        self.duration = kwargs.pop('duration', 60)
+        self.duration = kwargs.pop('duration', "")
 
 
 class Playlist:
@@ -240,7 +239,7 @@ class Audio:
         self.downloaders = {}  # sid: object
         self.settings = dataIO.load_json("data/audio/settings.json")
         self.server_specific_setting_keys = ["VOLUME", "VOTE_ENABLED",
-                                             "VOTE_THRESHOLD", "NOPPL_DISCONNECT"]
+                                             "VOTE_THRESHOLD"]
         self.cache_path = "data/audio/cache"
         self.local_playlist_path = "data/audio/localtracks"
         self._old_game = False
@@ -746,8 +745,8 @@ class Audio:
                 song = await self._guarantee_downloaded(server, url)
             except MaximumLength:
                 log.warning("I can't play URL below because it is too long."
-                            " Use [p]audioset maxlength to change this.\n\n"
-                            "{}".format(url))
+                            " Use {}audioset maxlength to change this.\n\n"
+                            "{}".format(self.bot.command_prefix[0], url))
                 raise
             local = False
         else:  # Assume local
@@ -993,24 +992,6 @@ class Audio:
         await self.bot.say("Max cache size set to {} MB.".format(size))
         self.save_settings()
 
-    @audioset.command(name="emptydisconnect", pass_context=True)
-    @checks.mod_or_permissions(manage_messages=True)
-    async def audioset_emptydisconnect(self, ctx):
-        """Toggles auto disconnection when everyone leaves the channel"""
-        server = ctx.message.server
-        settings = self.get_server_settings(server.id)
-        noppl_disconnect = settings.get("NOPPL_DISCONNECT", True)
-        self.set_server_setting(server, "NOPPL_DISCONNECT",
-                                not noppl_disconnect)
-        if not noppl_disconnect:
-            await self.bot.say("If there is no one left in the voice channel"
-                               " the bot will automatically disconnect after"
-                               " five minutes.")
-        else:
-            await self.bot.say("The bot will no longer auto disconnect"
-                               " if the voice channel is empty.")
-        self.save_settings()
-
     @audioset.command(name="maxlength")
     @checks.is_owner()
     async def audioset_maxlength(self, length: int):
@@ -1177,7 +1158,7 @@ class Audio:
             await send_cmd_help(ctx)
 
     @local.command(name="start", pass_context=True, no_pm=True)
-    async def play_local(self, ctx, *, name):
+    async def play_local(self, ctx, name):
         """Plays a local playlist"""
         server = ctx.message.server
         author = ctx.message.author
@@ -1269,6 +1250,7 @@ class Audio:
         voice_channel = author.voice_channel
 
         # Checking if playing in current server
+        await self.bot.say("Added {} to the queue".format(song.title))
 
         if self.is_playing(server):
             await ctx.invoke(self._queue, url=url)
@@ -1733,7 +1715,8 @@ class Audio:
                         reply += " (%d%% out of %d%% needed)" % (vote, thresh)
                     await self.bot.reply(reply)
             else:
-                await self.bot.say("You need to be in the voice channel to skip the music.")
+                await self.bot.reply("you aren't in the current playback"
+                                     " channel.")
         else:
             await self.bot.say("Can't skip if I'm not playing.")
 
@@ -1747,24 +1730,14 @@ class Audio:
         mod_role = settings.get_server_mod(server)
 
         is_owner = member.id == settings.owner
-        is_server_owner = member == server.owner
         is_admin = discord.utils.get(member.roles, name=admin_role) is not None
         is_mod = discord.utils.get(member.roles, name=mod_role) is not None
-
 
         nonbots = sum(not m.bot for m in member.voice_channel.voice_members)
         alone = nonbots <= 1
 
-        return is_owner or is_server_owner or is_admin or is_mod or alone
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def sing(self, ctx):
-        """Makes Red sing one of her songs"""
-        ids = ("zGTkAVsrfg8", "cGMWL8cOeAU", "vFrjMq4aL-g", "WROI5WYBU_A",
-               "41tIUr_ex3g", "f9O2Rjn1azc")
-        url = "https://www.youtube.com/watch?v={}".format(choice(ids))
-        await ctx.invoke(self.play, url_or_search_terms=url)
-
+        return is_owner or is_admin or is_mod or alone
+    
     @commands.command(pass_context=True, no_pm=True)
     async def song(self, ctx):
         """Info about the current song."""
@@ -1806,16 +1779,13 @@ class Audio:
         """Stops a currently playing song or playlist. CLEARS QUEUE."""
         server = ctx.message.server
         if self.is_playing(server):
-            if ctx.message.author.voice_channel == server.me.voice_channel:
-                if self.can_instaskip(ctx.message.author):
-                    await self.bot.say('Stopping...')
-                    self._stop(server)
-                else:
-                    await self.bot.say("You can't stop music when there are other"
-                                       " people in the channel! Vote to skip"
-                                       " instead.")
+            if self.can_instaskip(ctx.message.author):
+                await self.bot.say('Stopping...')
+                self._stop(server)
             else:
-                await self.bot.say("You need to be in the voice channel to stop the music.")
+                await self.bot.say("You can't stop music when there are other"
+                                   " people in the channel! Vote to skip"
+                                   " instead.")
         else:
             await self.bot.say("Can't stop if I'm not playing.")
 
@@ -1869,18 +1839,11 @@ class Audio:
                     stop_times[server] = int(time.time())
 
                 if hasattr(vc, 'audio_player'):
-                    if vc.audio_player.is_done():
+                    if (vc.audio_player.is_done() or len(vc.channel.voice_members) == 1):
                         if server not in stop_times or stop_times[server] is None:
                             log.debug("putting sid {} in stop loop".format(server.id))
                             stop_times[server] = int(time.time())
-
-                    noppl_disconnect = self.get_server_settings(server)
-                    noppl_disconnect = noppl_disconnect.get("NOPPL_DISCONNECT", True)
-                    if noppl_disconnect and len(vc.channel.voice_members) == 1:
-                        if server not in stop_times or stop_times[server] is None:
-                            log.debug("putting sid {} in stop loop".format(server.id))
-                            stop_times[server] = int(time.time())
-                    elif not vc.audio_player.is_done():
+                    elif vc.audio_player.is_playing():
                         stop_times[server] = None
 
             for server in stop_times:
@@ -1902,11 +1865,6 @@ class Audio:
         if sid not in self.settings["SERVERS"]:
             self.settings["SERVERS"][sid] = {}
         ret = self.settings["SERVERS"][sid]
-
-        # Not the cleanest way. Some refactoring is suggested if more settings
-        # have to be added
-        if "NOPPL_DISCONNECT" not in ret:
-            ret["NOPPL_DISCONNECT"] = True
 
         for setting in self.server_specific_setting_keys:
             if setting not in ret:
@@ -2089,13 +2047,7 @@ def check_files():
         print("Creating default audio settings.json...")
         dataIO.save_json(settings_path, default)
     else:  # consistency check
-        try:
-            current = dataIO.load_json(settings_path)
-        except JSONDecodeError:
-            # settings.json keeps getting corrupted for unknown reasons. Let's
-            # try to keep it from making the cog load fail.
-            dataIO.save_json(settings_path, default)
-            current = dataIO.load_json(settings_path)
+        current = dataIO.load_json(settings_path)
         if current.keys() != default.keys():
             for key in default.keys():
                 if key not in current.keys():
@@ -2122,7 +2074,7 @@ def verify_ffmpeg_avconv():
 def setup(bot):
     check_folders()
     check_files()
-
+    
     if youtube_dl is None:
         raise RuntimeError("You need to run `pip3 install youtube_dl`")
     if opus is False:
@@ -2146,7 +2098,7 @@ def setup(bot):
           "and do ALL the steps in order.\n"
           "https://twentysix26.github.io/Red-Docs/\n"
           "".format(msg))
-
+    
     n = Audio(bot, player=player)  # Praise 26
     bot.add_cog(n)
     bot.add_listener(n.voice_state_update, 'on_voice_state_update')

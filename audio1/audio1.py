@@ -1251,7 +1251,7 @@ class Audio:
         song = self._get_queue_nowplaying(server)
 
         # Checking if playing in current server
-        await self.bot.say("{}:white_check_mark:")
+        await self.bot.say("{}:white_check_mark:".format(author.mention))
 
         if self.is_playing(server):
             await ctx.invoke(self._queue, url=url)

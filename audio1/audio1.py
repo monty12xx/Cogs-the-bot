@@ -1250,7 +1250,7 @@ class Audio:
         voice_channel = author.voice_channel
 
         # Checking if playing in current server
-        await self.bot.say("Added {} to the queue".format(song.title))
+        await self.bot.say("Added {} to the queue".format(self.song.title))
 
         if self.is_playing(server):
             await ctx.invoke(self._queue, url=url)
@@ -1737,7 +1737,7 @@ class Audio:
         alone = nonbots <= 1
 
         return is_owner or is_admin or is_mod or alone
-    
+
     @commands.command(pass_context=True, no_pm=True)
     async def song(self, ctx):
         """Info about the current song."""

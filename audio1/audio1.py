@@ -116,13 +116,13 @@ class deque(collections.deque):
 
 
 class Song:
-    def __init__(self, **kwargs):
-        self.__dict__ = kwargs
-        self.title = kwargs.pop('title', None)
-        self.id = kwargs.pop('id', None)
-        self.url = kwargs.pop('url', None)
-        self.webpage_url = kwargs.pop('webpage_url', "")
-        self.duration = kwargs.pop('duration', "")
+    def __init__(self, title, id, url, duration, location, requester):
+        self.title = title
+        self.id = id
+        self.url = url
+        self.duration = duration
+        self.location = location
+        self.requester = requester
 
 
 class Playlist:

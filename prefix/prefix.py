@@ -23,8 +23,38 @@ import aiohttp
 
 
 class party:
+    """All owner-only commands that relate to debug bot operations.
+    """
+
     def __init__(self, bot):
         self.bot = bot
+        self.setowner_lock = False
+        self._announce_msg = None
+        self._announce_server = None
+        self._settings = dataIO.load_json('data/admin/settings.json')
+        self._settable_roles = self._settings.get("ROLES", {})
+        self.file_path = "data/red/disabled_commands.json"
+        self.disabled_commands = dataIO.load_json(self.file_path)
+        self.session = aiohttp.ClientSession(loop=self.bot.loop)
+
+    async def _confirm_invite(self, server, owner, ctx):
+        answers = ("yes", "y")
+        invite = await self.bot.create_invite(server)
+        if ctx.message.channel.is_private:
+            await self.bot.say(invite)
+        else:
+            await self.bot.say("Are you sure you want to post an invite to {} "
+                               "here? (yes/no)".format(server.name))
+            msg = await self.bot.wait_for_message(author=owner, timeout=15)
+            if msg is None:
+                await self.bot.say("I guess not.")
+            elif msg.content.lower().strip() in answers:
+                await self.bot.say(invite)
+            else:
+                await self.bot.say("Alright then.")
+
+    def _is_server_locked(self):
+        return self._settings.get("SERVER_LOCK", False)
         
     @commands.command(pass_context=True)
     @checks.is_owner()
@@ -66,4 +96,3 @@ class party:
 def setup(bot):
     n = party(bot)
     bot.add_cog(n)
-    

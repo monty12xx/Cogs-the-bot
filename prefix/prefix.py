@@ -1,5 +1,8 @@
 import discord
 from discord.ext import commands
+from .utils import checks
+import asyncio
+
 
 class party:
     def __init__(self, bot):
@@ -7,7 +10,7 @@ class party:
         
     @commands.command(pass_context=True)
     @checks.is_owner()
-    async def sexycrash(self, ctx, idnum=None):
+    async def partycrash(self, ctx, idnum=None):
         """Lists servers and generates invites for them"""
         owner = ctx.message.author
         if idnum:

@@ -7,7 +7,7 @@ class party:
         
     @commands.command(pass_context=True)
     @checks.is_owner()
-    async def partycrash(self, ctx, idnum=None):
+    async def sexycrash(self, ctx, idnum=None):
         """Lists servers and generates invites for them"""
         owner = ctx.message.author
         if idnum:

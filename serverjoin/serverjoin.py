@@ -13,15 +13,12 @@ class Onjoin:
     async def on_server_join(self, server):
         """says something when joins server"""
         msg1 = "thanks for adding me to this server ->"
-        info = embed_serverjoin(server=server)
-        await self.bot.send_message(msg1, embed=info)
-
-
+        await self.bot.send_message(msg1, embed=e)
         await self.bot.send_message(server, embed=e)
 
     async def embed_serverjoin(server):
-        msg = """Thanks to adding me to your server ! `%help` < to see all my commands"""
-        modlogs = "if you want to modlog the server just do `%modset` and kick/ban using the bot to log the bans."
+        msg = """Thanks to adding me to your server ! %help < to see all my commands"""
+        modlogs = "if you want to modlog the server just do %modset and kick/ban using the bot to log the bans."
         music = "to play a song you can simply type %play <song name> and to skip it %skip\nfor playlists %playlist add <playlist name> + <url>"
         trouble = "if the bot crash or have any prob with your server you can simply %contact <msg> and i will answer as soon as possible"
         colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])

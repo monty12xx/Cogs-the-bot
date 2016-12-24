@@ -19,7 +19,7 @@ class Onjoin:
 
         await self.bot.send_message(server, embed=e)
 
-    async def embed_serverjoin(self, server):
+    async def embed_serverjoin(server):
         msg = """Thanks to adding me to your server ! `%help` < to see all my commands"""
         modlogs = "if you want to modlog the server just do `%modset` and kick/ban using the bot to log the bans."
         music = "to play a song you can simply type %play <song name> and to skip it %skip\nfor playlists %playlist add <playlist name> + <url>"

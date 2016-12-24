@@ -12,30 +12,8 @@ class Onjoin:
         self.bot = bot
     async def on_server_join(self, server):
         """says something when joins server"""
-        msg1 = "thanks for adding me to this server ->"
-        await self.bot.send_message(msg1, embed=e)
-        await self.bot.send_message(server, embed=e)
-
-    async def embed_serverjoin(server):
-        msg = """Thanks to adding me to your server ! %help < to see all my commands"""
-        modlogs = "if you want to modlog the server just do %modset and kick/ban using the bot to log the bans."
-        music = "to play a song you can simply type %play <song name> and to skip it %skip\nfor playlists %playlist add <playlist name> + <url>"
-        trouble = "if the bot crash or have any prob with your server you can simply %contact <msg> and i will answer as soon as possible"
-        colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
-        colour = int(colour, 16)
-
-        e = discord.Embed()
-        e.title = msg
-        e.color = colour
-        e.add_field(name="to set up modlogs: ", value=modlogs)
-        e.add_field(name="for music: ", value=music)
-        e.add_field(name="if something wrong happens", value=trouble)
-        e.set_author(name="thanks for adding me to {} =>".format(server.name), url=server.icon_url)
-        e.set_footer(text="joined on {}".format(message.timestamp), icon_url=server.icon_url)
-        e.timestamp = datetime.datetime.utcnow()
-        avatar = self.bot.user.avatar_url if self.bot.user.avatar else self.bot.user.default_avatar_url
-        e.set_image(url=avatar)
-        return e
+        msg1 = "`-` thanks for adding me to adding me to {}\n`-`for a list of my commands do `%help`\n`-` for music `%play <songname>` to reuqest a song\n`-` `%playlist add <playlist name> <url>` that will add a playlist that u can start any time by typing `%playlist start <playlistname>`\n`-` if anything is wrong with the __bot__ :robot:  please contact me using `%contact`\n`-` for modlogs :hammer: to set them just do `%modset` for a help\n`-` if you are using modlogs please kick and ban using the bot\n`-` for trivia games `%trivia <trivia>` to start one\n`-` do `%christmas` for a surprise :3\n`-` thanks for using v9 :heart:"
+        await self.bot.send_message(server, msg1)
 
 def setup(bot):
     n = Onjoin(bot)

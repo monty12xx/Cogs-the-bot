@@ -13,7 +13,7 @@ class Onjoin:
     async def on_server_join(self, server):
         """says something when joins server"""
         msg1 = "thanks for adding me to this server ->"
-        info = await self.embed_serverjoin(server=server)
+        info = embed_serverjoin(server=server)
         await self.bot.send_message(msg1, embed=info)
 
 
@@ -38,7 +38,6 @@ class Onjoin:
         e.timestamp = datetime.datetime.utcnow()
         avatar = self.bot.user.avatar_url if self.bot.user.avatar else self.bot.user.default_avatar_url
         e.set_image(url=avatar)
-        return e
 
 def setup(bot):
     n = Onjoin(bot)

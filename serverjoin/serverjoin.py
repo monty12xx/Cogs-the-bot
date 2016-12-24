@@ -38,7 +38,7 @@ class Onjoin:
         e.timestamp = datetime.datetime.utcnow()
         avatar = self.bot.user.avatar_url if self.bot.user.avatar else self.bot.user.default_avatar_url
         e.set_image(url=avatar)
-        return self.embed_serverjoin()
+        return e
 
 def setup(bot):
     n = Onjoin(bot)

@@ -1123,7 +1123,7 @@ class Audio:
             self._cache_size()))
 
     @commands.group(pass_context=True, hidden=True, no_pm=True)
-    @checks.is_owner()
+    @checks.mod_or_permissions()
     async def disconnect(self, ctx):
         """Disconnects from voice channel in current server."""
         if ctx.invoked_subcommand is None:

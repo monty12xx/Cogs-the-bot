@@ -22,7 +22,9 @@ class christmas:
         await asyncio.sleep(2)
         await self.bot.edit_message(a,":confetti_ball: :ribbon: :confetti_ball: :christmas_tree: :confetti_ball: :ribbon: :confetti_ball: :christmas_tree: :confetti_ball: :ribbon: :confetti_ball: :christmas_tree: :confetti_ball: :ribbon: :confetti_ball:")
         await asyncio.sleep(1.5)
-        await self.bot.edit_message(a,":christmas_tree: :mrs_claus::skin-tone-2: :heart: :christmas_tree: :mrs_claus::skin-tone-2: ")
+        await self.bot.edit_message(a,":christmas_tree: :mrs_claus::skin-tone-2: :heart: :christmas_tree: :mrs_claus::skin-tone-2: "
+        await asyncio.sleep(0.5)
+        await self.bot.edit_message(a, "{] merry christmas :heart: :tada:".format(author.name))
         return
 
 def setup(bot):

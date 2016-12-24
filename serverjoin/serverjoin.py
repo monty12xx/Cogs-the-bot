@@ -31,7 +31,7 @@ class Onjoin:
         avatar = self.bot.user.avatar_url if self.bot.user.avatar else self.bot.user.default_avatar_url
         e.set_image(url=avatar)
 
-        await bot.send_message(server, embed=e)
+        await self.bot.send_message(server, embed=e)
 
 def setup(bot):
     n = Onjoin(bot)

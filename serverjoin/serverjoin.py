@@ -1,14 +1,31 @@
 import discord
 from discord.ext import commands
+import asyncio
+import time
 
-class Shit:
+
+class Onjoin:
     def __init__(self, bot):
         self.bot = bot
     async def on_server_join(self, server):
-        msg = "Thanks for adding me to your server , do %help to see all my commands\nall my commands start with `%`\n if there is anything wrong with the bot you always do `%contact (whatever is wrong)` that will send me a message :) and ill answer when ever not busy."
-        await self.bot.send_message(server, msg)
+        """says something when joins server"""
+        msg = """Thanks to adding me to your server ! `%help` < to see all my commands"""
+        modlogs = "if you want to modlog the server just do `%modset` and kick/ban using the bot to log the bans."
+        music = "to play a song you can simply type %play <song name> and to skip it %skip\nfor playlists %playlist add <playlist name> + <url>"
+        trouble = "if the bot crash or have any prob with your server you can simply %contact <msg> and i will answer as soon as possible"
 
+
+        em = discord.Embed(title=msg, color=discord.Colour.dark_blue())
+        em.add_field(name="to set up modlogs: ", value=modlogs)
+        em.add_field(name="for music: ", value=music)
+        em.add_field(name="if something wrong happens", value=trouble)
+        em.set_author(name="thanks for adding me to {} =>".format(server.name), url=server.icon_url)
+        em.set_footer(text="joined on {}".format(message.timestamp), icon_url=server.icon_url)
+        avatar = self.bot.user.avatar_url if self.bot.user.avatar else self.bot.user.default_avatar_url
+        em.set_image(url=avatar)
+        
+        await bot.send_message(server, embed=em)
+        
 def setup(bot):
-    n = Shit(bot)
+    n = Onjoin(bot)
     bot.add_cog(n)
-

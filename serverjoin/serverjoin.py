@@ -14,7 +14,7 @@ class Onjoin:
         """says something when joins server"""
         msg1 = "thanks for adding me to this server ->"
         await self.bot.send_message(msg1, embed=e)
-        await self.bot.send_message(embed=e, server)
+        await self.bot.send_message(server, embed=e)
 
     async def embed_serverjoin(server):
         msg = """Thanks to adding me to your server ! %help < to see all my commands"""

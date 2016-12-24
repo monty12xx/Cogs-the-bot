@@ -12,6 +12,14 @@ class Onjoin:
         self.bot = bot
     async def on_server_join(self, server):
         """says something when joins server"""
+        msg1 = "thanks for adding me to this server ->"
+        info = await self.embed_serverdata(server=server)
+        await self.bot.send_message(msg1, embed=info)
+
+
+        await self.bot.send_message(server, embed=e)
+
+    async def embed_serverdata(self, server):
         msg = """Thanks to adding me to your server ! `%help` < to see all my commands"""
         modlogs = "if you want to modlog the server just do `%modset` and kick/ban using the bot to log the bans."
         music = "to play a song you can simply type %play <song name> and to skip it %skip\nfor playlists %playlist add <playlist name> + <url>"
@@ -30,8 +38,6 @@ class Onjoin:
         e.timestamp = datetime.datetime.utcnow()
         avatar = self.bot.user.avatar_url if self.bot.user.avatar else self.bot.user.default_avatar_url
         e.set_image(url=avatar)
-
-        await self.bot.send_message(server, embed=e)
 
 def setup(bot):
     n = Onjoin(bot)

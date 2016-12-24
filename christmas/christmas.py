@@ -14,13 +14,13 @@ class christmas:
         channel = ctx.message.channel
         author = ctx.message.author
 
-        await self.bot.send_message(ctx.message.server, "{} merry christmas ! :heart: :christmas_tree: *wait for a surprise*".format(author.mention))
-        await asyncio.sleep(5)
-        await self.bot.edit_message(ctx.message.server, ":christmas_tree: :ribbon: :christmas_tree: :ribbon: :christmas_tree: :ribbon: :christmas_tree:")
-        await self.bot.edit_message(ctx.message.server, ":ribbon: :christmas_tree: :ribbon: :christmas_tree: :ribbon: :christmas_tree:  :christmas_tree: ")
+        await self.bot.send_message(channel, "{} merry christmas ! :heart: :christmas_tree: *wait for a surprise*".format(author.mention))
         await asyncio.sleep(2)
-        await self.bot.edit_message(ctx.message.server, ":confetti_ball: :ribbon: :confetti_ball: :christmas_tree: :confetti_ball: :ribbon: :confetti_ball: :christmas_tree: :confetti_ball: :ribbon: :confetti_ball: :christmas_tree: :confetti_ball: :ribbon: :confetti_ball:")
-        await self.bot.edit_message(ctx.message.server, ":christmas_tree: :mrs_claus::skin-tone-2: :heart: :christmas_tree: :mrs_claus::skin-tone-2: ")
+        await self.bot.edit_message(channel, ":christmas_tree: :ribbon: :christmas_tree: :ribbon: :christmas_tree: :ribbon: :christmas_tree:")
+        await self.bot.edit_message(channel, ":ribbon: :christmas_tree: :ribbon: :christmas_tree: :ribbon: :christmas_tree:  :christmas_tree: ")
+        await asyncio.sleep(2)
+        await self.bot.edit_message(channel, ":confetti_ball: :ribbon: :confetti_ball: :christmas_tree: :confetti_ball: :ribbon: :confetti_ball: :christmas_tree: :confetti_ball: :ribbon: :confetti_ball: :christmas_tree: :confetti_ball: :ribbon: :confetti_ball:")
+        await self.bot.edit_message(channel, ":christmas_tree: :mrs_claus::skin-tone-2: :heart: :christmas_tree: :mrs_claus::skin-tone-2: ")
         return
 
 def setup(bot):

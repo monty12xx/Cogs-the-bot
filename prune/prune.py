@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from .utils import config, checks
+from .utils import checks
 import datetime
 import random
 

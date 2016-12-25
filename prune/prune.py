@@ -3,6 +3,7 @@ from discord.ext import commands
 from .utils import checks
 import datetime
 import random
+from __main__ import send_cmd_help, settings
 
 class prune:
     def __init__(self, bot):

@@ -30,6 +30,7 @@ class prune:
         if len(deleted):
             messages.append('')
             removed = 0
+            await self.bot.delete_message(message)
 
         await self.bot.say('\n'.join(messages), delete_after=10)
 
@@ -64,7 +65,7 @@ class prune:
 
         The substring must be at least 3 characters long.
         """
-        if len(substr) < 3:
+        if len(substr) < 1:
             await self.bot.say('The substring length must be at least 3 characters.')
             return
 

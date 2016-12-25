@@ -105,7 +105,7 @@ class Statistics:
                 voice_channels += 1
         channels = text_channels + voice_channels
 
-        em = discord.Embed(description='\a\n', color=discord.Color.dark_gold())
+        em = discord.Embed(description='\a\n', color=discord.Color.dark_blue())
         avatar = self.bot.user.avatar_url if self.bot.user.avatar else self.bot.user.default_avatar_url
         em.set_author(name='Statistics of {}'.format(name), icon_url=avatar)
         em.add_field(name='Owner', value=owner)
@@ -117,8 +117,8 @@ class Statistics:
         em.add_field(name='**Total channels**', value=str(channels))
         em.add_field(name='**Messages per/server**', value=str(self.received_messages))
         em.add_field(name='**Commands used**', value=str(self.sent_messages))
-        em.add_field(name='\a', value='\a')
         em.add_field(name="**Changelog:**", value=changelog)
+        em.add_field(name='\a', value='\a')
 
         em.add_field(name='**Active cogs**', value=str(len(self.bot.cogs)))
         em.add_field(name='**Online Commands**', value=str(len(self.bot.commands)))
@@ -126,10 +126,6 @@ class Statistics:
         em.add_field(name='\a', value='\a', inline=False)
         em.add_field(name='**CPU usage**', value='{0:.1f}%'.format(cpu_usage))
         em.add_field(name='**Mem usage**', value='{0:.1f}%'.format(mem_v.percent))
-
-        em.add_field(name='\a', value='\a')
-        em.add_field(name='\a', value='\a')
-        em.add_field(name='\a', value='\a')
         em.set_footer(text='discord.py version {}'.format(discord.__version__))
         return em
 

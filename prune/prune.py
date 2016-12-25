@@ -14,7 +14,7 @@ class prune:
         """Prunes messages that meet a criteria."""
 
         if ctx.invoked_subcommand is None:
-            await self.bot.say('Invalid criteria passed "{0.subcommand_passed}"'.format(ctx))
+            await send_cmd_help(ctx)
 
     async def do_removal(self, message, limit, predicate):
         deleted = await self.bot.purge_from(message.channel, limit=limit, before=message, check=predicate)

@@ -1,16 +1,15 @@
-    from cogs.utils.dataIO import dataIO
-    from discord.ext import commands
-    from .utils import checks
-    import datetime
-    import asyncio
-    import discord
-    import time
-    import os
-
-    try:
-        import psutil
-    except:
-        psutil = False
+from cogs.utils.dataIO import dataIO
+from discord.ext import commands
+from .utils import checks
+import datetime
+import asyncio
+import discord
+import time
+import os
+try:
+    import psutil
+except:
+    psutil = False
 
 
     class Statistics:

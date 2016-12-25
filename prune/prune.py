@@ -30,7 +30,7 @@ class prune:
         if len(deleted):
             messages.append('')
             removed = 0
-            await self.bot.say("removed {} Message(s)".format(removed))
+            messages.extend(map(lambda t: '**{0[0]}**: {0[1]}'.format(t), removed))
 
         await self.bot.say('\n'.join(messages), delete_after=10)
 

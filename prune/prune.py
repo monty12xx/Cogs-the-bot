@@ -27,6 +27,12 @@ class prune:
     async def do_removal(self, message, limit, predicate):
         deleted = await self.bot.purge_from(message.channel, limit=limit, before=message, check=predicate)
         messages = ['%s %s pruned.' % (len(deleted), 'message was' if len(deleted) == 1 else 'messages were')]
+        if len(deleted):
+            messages.append('')
+            removed = 0
+            await self.bot.say("removed {} Message(s)".format(removed))
+
+        await self.bot.say('\n'.join(messages), delete_after=10)
 
     @prune.command(pass_context=True)
     async def embeds(self, ctx, search=100):

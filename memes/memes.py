@@ -90,7 +90,7 @@
             servers = str(len(self.bot.servers))
             text_channels = 0
             voice_channels = 0
-            changelog= "**NaN**
+            changelog = "**NaN**
 
             cpu_p = psutil.cpu_percent(interval=None, percpu=True)
             cpu_usage = sum(cpu_p)/len(cpu_p)
@@ -107,7 +107,6 @@
             em = discord.Embed(description='\a\n', color=discord.Color.dark_gold())
             avatar = self.bot.user.avatar_url if self.bot.user.avatar else self.bot.user.default_avatar_url
             em.set_author(name='Statistics of {}'.format(name), icon_url=avatar)
-            em.add_field()
             em.add_field(name='**Users**', value=users)
             em.add_field(name='**Servers**', value=servers)
             em.add_field(name='**Uptime**', value='{} Day - {} Hr - {} Min'.format(str(days), str(hours), str(minutes)))

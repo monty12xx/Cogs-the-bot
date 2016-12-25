@@ -35,32 +35,32 @@ class prune:
 
         await self.bot.say('\n'.join(messages), delete_after=10)
 
-    @remove.command(pass_context=True)
+    @prune.command(pass_context=True)
     async def embeds(self, ctx, search=100):
         """Removes messages that have embeds in them."""
         await self.do_removal(ctx.message, search, lambda e: len(e.embeds))
 
-    @remove.command(pass_context=True)
+    @prune.command(pass_context=True)
     async def files(self, ctx, search=100):
         """Removes messages that have attachments in them."""
         await self.do_removal(ctx.message, search, lambda e: len(e.attachments))
 
-    @remove.command(pass_context=True)
+    @prune.command(pass_context=True)
     async def images(self, ctx, search=100):
         """Removes messages that have embeds or attachments."""
         await self.do_removal(ctx.message, search, lambda e: len(e.embeds) or len(e.attachments))
 
-    @remove.command(name='all', pass_context=True)
+    @prune.command(name='all', pass_context=True)
     async def _remove_all(self, ctx, search=100):
         """Removes all messages."""
         await self.do_removal(ctx.message, search, lambda e: True)
 
-    @remove.command(pass_context=True)
+    @prune.command(pass_context=True)
     async def user(self, ctx, member : discord.Member, search=100):
         """Removes all messages by the member."""
         await self.do_removal(ctx.message, search, lambda e: e.author == member)
 
-    @remove.command(pass_context=True)
+    @prune.command(pass_context=True)
     async def contains(self, ctx, *, substr : str):
         """Removes all messages containing a substring.
 
@@ -72,7 +72,7 @@ class prune:
 
         await self.do_removal(ctx.message, 100, lambda e: substr in e.content)
 
-    @remove.command(name='bot', pass_context=True)
+    @prune.command(name='bot', pass_context=True)
     async def _bot(self, ctx, prefix, *, member: discord.Member):
         """Removes a bot user's messages and messages with their prefix.
 
@@ -83,7 +83,7 @@ class prune:
             return m.author == member or m.content.startswith(prefix)
         await self.do_removal(ctx.message, 100, predicate)
 
-    @remove.command(pass_context=True)
+    @prune.command(pass_context=True)
     async def adv(self, ctx, *, args: str):
         """A more advanced prune command.
 

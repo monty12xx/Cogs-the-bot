@@ -24,6 +24,9 @@ class prune:
         if ctx.invoked_subcommand is None:
             await self.bot.say('Invalid criteria passed "{0.subcommand_passed}"'.format(ctx))
 
+    async def do_removal(self, message, limit, predicate):
+        deleted = await self.bot.purge_from(message.channel, limit=limit, before=message, check=predicate)
+        messages = ['%s %s pruned.' % (len(deleted), 'message was' if len(deleted) == 1 else 'messages were')]
 
     @prune.command(pass_context=True)
     async def embeds(self, ctx, search=100):

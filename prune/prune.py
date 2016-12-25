@@ -11,14 +11,14 @@ class prune:
     @commands.group(pass_context=True, no_pm=True, aliases=['purge'])
     @checks.admin_or_permissions(manage_messages=True)
     async def prune(self, ctx):
-        """Removes messages that meet a criteria.
+        """Prunes messages that meet a criteria.
 
         In order to use this command, you must have Manage Messages permissions
         or have the Bot Admin role. Note that the bot needs Manage Messages as
         well. These commands cannot be used in a private message.
 
         When the command is done doing its work, you will get a private message
-        detailing which users got removed and how many messages got removed.
+        detailing which users got pruned and how many messages got pruned.
         """
 
         if ctx.invoked_subcommand is None:
@@ -26,8 +26,7 @@ class prune:
 
     async def do_removal(self, message, limit, predicate):
         deleted = await self.bot.purge_from(message.channel, limit=limit, before=message, check=predicate)
-        spammers = Counter(m.author.display_name for m in deleted)
-        messages = ['%s %s removed.' % (len(deleted), 'message was' if len(deleted) == 1 else 'messages were')]
+        messages = ['%s %s pruned.' % (len(deleted), 'message was' if len(deleted) == 1 else 'messages were')]
         if len(deleted):
             messages.append('')
             spammers = sorted(spammers.items(), key=lambda t: t[1], reverse=True)
@@ -37,32 +36,32 @@ class prune:
 
     @prune.command(pass_context=True)
     async def embeds(self, ctx, search=100):
-        """Removes messages that have embeds in them."""
+        """prunes messages that have embeds in them."""
         await self.do_removal(ctx.message, search, lambda e: len(e.embeds))
 
     @prune.command(pass_context=True)
     async def files(self, ctx, search=100):
-        """Removes messages that have attachments in them."""
+        """prunes messages that have attachments in them."""
         await self.do_removal(ctx.message, search, lambda e: len(e.attachments))
 
     @prune.command(pass_context=True)
     async def images(self, ctx, search=100):
-        """Removes messages that have embeds or attachments."""
+        """prunes messages that have embeds or attachments."""
         await self.do_removal(ctx.message, search, lambda e: len(e.embeds) or len(e.attachments))
 
     @prune.command(name='all', pass_context=True)
     async def _remove_all(self, ctx, search=100):
-        """Removes all messages."""
+        """prunes all messages."""
         await self.do_removal(ctx.message, search, lambda e: True)
 
     @prune.command(pass_context=True)
     async def user(self, ctx, member : discord.Member, search=100):
-        """Removes all messages by the member."""
+        """prunes all messages by the member."""
         await self.do_removal(ctx.message, search, lambda e: e.author == member)
 
     @prune.command(pass_context=True)
     async def contains(self, ctx, *, substr : str):
-        """Removes all messages containing a substring.
+        """prunes all messages containing a substring.
 
         The substring must be at least 3 characters long.
         """
@@ -74,7 +73,7 @@ class prune:
 
     @prune.command(name='bot', pass_context=True)
     async def _bot(self, ctx, prefix, *, member: discord.Member):
-        """Removes a bot user's messages and messages with their prefix.
+        """prunes a bot user's messages and messages with their prefix.
 
         The member doesn't have to have the [Bot] tag to qualify for removal.
         """
@@ -97,7 +96,7 @@ class prune:
         the `--or` flag is passed.
 
         Criteria:
-          user      A mention or name of the user to remove.
+          user      A mention or name of the user to prune.
           contains  A substring to search for in the message.
           starts    A substring to search if the message starts with.
           ends      A substring to search if the message ends with.

@@ -175,4 +175,4 @@ class prune:
 
 def setup(bot):
     n = prune(bot)
-    n.add_cog(n)
+    bot.add_cog(n)

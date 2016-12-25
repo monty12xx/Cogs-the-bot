@@ -90,7 +90,7 @@
             servers = str(len(self.bot.servers))
             text_channels = 0
             voice_channels = 0
-            changelog = "**NaN**
+            changelog = "**NaN**"
 
             cpu_p = psutil.cpu_percent(interval=None, percpu=True)
             cpu_usage = sum(cpu_p)/len(cpu_p)

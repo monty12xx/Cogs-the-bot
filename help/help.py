@@ -123,7 +123,7 @@ class Help:
                 #this is where all the hecked up stuff happens
                 #since this is a dm, we will send a selfmade description
                 page_no = 1
-                about = "V9-Simple moderationg logger , musicbot fun and etc\nV9.support server:https://discord.gg/p3Kv2\nAsk for anything in the support server and here a list of my commands below >>"
+                about = "a simple moderation fun bot + music and more stuff , to invite V9 just type %invite simply\nlist of my commands below >>>>"
                 colour = ''.join([randchoice('0123456789ABCDEF') for x in range(6)])
                 colour = int(colour, 16)
                 await self.bot.send_message(ctx.message.author, embed = discord.Embed(title = "About V9", description = about, colour = colour, timestamp = ctx.message.timestamp))

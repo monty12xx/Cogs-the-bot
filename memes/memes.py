@@ -117,8 +117,6 @@ class Statistics:
         em.add_field(name='**Total channels**', value=str(channels))
         em.add_field(name='**Messages per/server**', value=str(self.received_messages))
         em.add_field(name='**Commands used**', value=str(self.sent_messages))
-        em.add_field(name='\a', value='\a')
-        em.add_field(name='\a', value='\a')
         em.add_field(name='**Active cogs**', value=str(len(self.bot.cogs)))
         em.add_field(name='**Online Commands**', value=str(len(self.bot.commands)))
         em.add_field(name='\a', value='\a')

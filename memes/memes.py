@@ -120,6 +120,7 @@ class Statistics:
         em.add_field(name="**Changelog:**", value=changelog)
         em.add_field(name='\a', value='\a')
         em.add_field(name='\a', value='\a')
+        em.add_field(name='\a', value='\a', inline=False)
         em.add_field(name='**Active cogs**', value=str(len(self.bot.cogs)))
         em.add_field(name='**Online Commands**', value=str(len(self.bot.commands)))
         em.add_field(name='\a', value='\a', inline=False)

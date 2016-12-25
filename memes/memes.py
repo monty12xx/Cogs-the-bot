@@ -12,16 +12,16 @@ except:
     psutil = False
 
 
-    class Statistics:
-        """
-        Statistics
-        """
-        def __init__(self, bot):
-            self.bot = bot
-            self.settings = dataIO.load_json('data/statistics/settings.json')
-            self.sent_messages = self.settings['SENT_MESSAGES']
-            self.received_messages = self.settings['RECEIVED_MESSAGES']
-            self.refresh_rate = self.settings['REFRESH_RATE']
+class Statistics:
+    """
+    Statistics
+    """
+    def __init__(self, bot):
+        self.bot = bot
+        self.settings = dataIO.load_json('data/statistics/settings.json')
+        self.sent_messages = self.settings['SENT_MESSAGES']
+        self.received_messages = self.settings['RECEIVED_MESSAGES']
+        self.refresh_rate = self.settings['REFRESH_RATE']
 
         async def _int(self, n):
             try:

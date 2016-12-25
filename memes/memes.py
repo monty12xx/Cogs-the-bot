@@ -157,31 +157,31 @@ except:
                 await asyncio.sleep(self.refresh_rate)
 
 
-    def check_folder():
-        if not os.path.exists("data/statistics"):
-            print("Creating data/statistics folder...")
-            os.makedirs("data/statistics")
+def check_folder():
+    if not os.path.exists("data/statistics"):
+        print("Creating data/statistics folder...")
+        os.makedirs("data/statistics")
 
 
-    def check_file():
-        data = {}
-        data['CHANNEL_ID'] = ''
-        data['SENT_MESSAGES'] = 0
-        data['RECEIVED_MESSAGES'] = 0
-        data['REFRESH_RATE'] = 5
-        f = "data/statistics/settings.json"
-        if not dataIO.is_valid_json(f):
-            print("Creating default settings.json...")
-            dataIO.save_json(f, data)
+def check_file():
+    data = {}
+    data['CHANNEL_ID'] = ''
+    data['SENT_MESSAGES'] = 0
+    data['RECEIVED_MESSAGES'] = 0
+    data['REFRESH_RATE'] = 5
+    f = "data/statistics/settings.json"
+    if not dataIO.is_valid_json(f):
+        print("Creating default settings.json...")
+        dataIO.save_json(f, data)
 
 
-    def setup(bot):
-        if psutil is False:
-            raise RuntimeError("psutil is not installed. Do 'pip3 install psutil --upgrade' to use this cog.")
-        else:
-            check_folder()
-            check_file()
-            n = Statistics(bot)
-            bot.add_cog(n)
-            bot.add_listener(n.incoming_messages, "on_message")
-            bot.loop.create_task(n.reload_stats())
+def setup(bot):
+    if psutil is False:
+        raise RuntimeError("psutil is not installed. Do 'pip3 install psutil --upgrade' to use this cog.")
+    else:
+        check_folder()
+        check_file()
+        n = Statistics(bot)
+        bot.add_cog(n)
+        bot.add_listener(n.incoming_messages, "on_message")
+        bot.loop.create_task(n.reload_stats())

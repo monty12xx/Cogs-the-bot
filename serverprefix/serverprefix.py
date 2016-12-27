@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from cogs.utils import checks
 from __main__ import set_cog
+from __main__ import settings
 from .utils.dataIO import dataIO
 from .utils.chat_formatting import pagify, box
 import random

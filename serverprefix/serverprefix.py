@@ -22,6 +22,7 @@ import glob
 import os
 import aiohttp
 
+log = logging.getLogger("red.owner")
 
 
 class serverprefix:

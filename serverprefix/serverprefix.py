@@ -20,6 +20,36 @@ import aiohttp
 class serverprefix:
     def __init__(self, bot):
         self.bot = bot
+
+    class CogNotFoundError(Exception):
+        pass
+
+    class CogLoadError(Exception):
+        pass
+
+    class NoSetupError(CogLoadError):
+        pass
+
+    class CogUnloadError(Exception):
+        pass
+
+    class OwnerUnloadWithoutReloadError(CogUnloadError):
+        pass
+
+    class Owner:
+        """All owner-only commands that relate to debug bot operations.
+        """
+
+        def __init__(self, bot):
+            self.bot = bot
+            self.setowner_lock = False
+            self.file_path = "data/red/disabled_commands.json"
+            self.disabled_commands = dataIO.load_json(self.file_path)
+            self.session = aiohttp.ClientSession(loop=self.bot.loop)
+
+        def __unload(self):
+            self.session.close()
+        
     @commands.command(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions(administrator=True)
     async def serverprefix(self, ctx, *prefixes):
@@ -50,7 +80,7 @@ class serverprefix:
                            "To go back to the global prefixes, do"
                            " `{}set serverprefix` "
                            "".format(p, prefixes[0]))
-        
+
 def setup(bot):
     n = serverprefix(bot)
     bot.add_cog(n)

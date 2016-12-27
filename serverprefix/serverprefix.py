@@ -4,13 +4,19 @@ from cogs.utils import checks
 from __main__ import set_cog
 from .utils.dataIO import dataIO
 from .utils.chat_formatting import pagify, box
+import random
+from random import randint
+from random import choice as randchoice
+from .utils.chat_formatting import *
 
 import importlib
 import traceback
 import logging
 import asyncio
+from copy import deepcopy
 import threading
 import datetime
+import time
 import glob
 import os
 import aiohttp
@@ -49,7 +55,7 @@ class serverprefix:
 
         def __unload(self):
             self.session.close()
-        
+
     @commands.command(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions(administrator=True)
     async def serverprefix(self, ctx, *prefixes):

@@ -86,7 +86,7 @@ class serverprefix:
         p = "Prefixes" if len(prefixes) > 1 else "Prefix"
         await self.bot.say("{} set for this server.\n"
                            "To go back to the global prefixes, do"
-                           " `{}set serverprefix` "
+                           " `{}serverprefix` "
                            "".format(p, prefixes[0]))
 
 def setup(bot):

@@ -2402,6 +2402,11 @@ def check_files():
                         "Adding " + str(key) + " field to audio settings.json")
             dataIO.save_json(settings_path, current)
 
+			
+			
+			
+			
+
 def verify_ffmpeg_avconv():
     try:
         subprocess.call(["ffmpeg", "-version"], stdout=subprocess.DEVNULL)
@@ -2416,6 +2421,19 @@ def verify_ffmpeg_avconv():
         return False
     else:
         return "avconv"
+		
+def check_folder():
+    if not os.path.exists('data/audio2'):
+        print('Creating data/audio2 folder...')
+        os.makedirs('data/audio2')
+
+
+def check_file():
+    away = {}
+    f = 'data/audio2/settings.json'
+    if not fileIO(f, 'check'):
+        print('Creating default settings.json...')
+        fileIO(f, 'save', away)
 
 def setup(bot):
     check_folders()

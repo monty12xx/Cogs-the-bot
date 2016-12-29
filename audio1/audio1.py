@@ -1316,6 +1316,13 @@ class Audio:
     @commands.command(pass_context=True, no_pm=True)
     async def play(self, ctx, *, url_or_search_terms):
         """Plays a link / searches and play"""
+        hasrole = False
+        for i in ctx.message.author.roles:
+            if i.id == musicrole:
+                hasrole = True
+        if hasrole == False:
+            await self.bot.say("```you don't have permissions to play songs ask owner to make a musicrole and give it to you if possible.```"
+            return
         try:
             db = fileIO(self.direct, "load")
             musicrole = db[ctx.message.server.id]["musicrole"]
@@ -1876,7 +1883,7 @@ class Audio:
     @commands.command(pass_context=True, aliases=["next"], no_pm=True)
     async def skip(self, ctx):
         """Skips a song, using the set threshold if the requester isn't
-        a mod or admin. Mods, admins and bot owner are not counted in
+        a mod or admin. Mods, admins and role owner are not counted in
         the vote threshold."""
         try:
             db = fileIO(self.direct, "load")
@@ -1923,7 +1930,7 @@ class Audio:
                         await self.bot.say("You need to be in the voice channel to skip the music.")
                 else:
                     await self.bot.say("Can't skip if I'm not playing.")
-            if musicrole is not None:
+                if musicrole is not None:
                 for i in ctx.message.author.roles:
                     if i.id == musicrole:
                         msg = ctx.message
@@ -2402,11 +2409,6 @@ def check_files():
                         "Adding " + str(key) + " field to audio settings.json")
             dataIO.save_json(settings_path, current)
 
-			
-			
-			
-			
-
 def verify_ffmpeg_avconv():
     try:
         subprocess.call(["ffmpeg", "-version"], stdout=subprocess.DEVNULL)
@@ -2421,19 +2423,6 @@ def verify_ffmpeg_avconv():
         return False
     else:
         return "avconv"
-		
-def check_folder():
-    if not os.path.exists('data/audio2'):
-        print('Creating data/audio2 folder...')
-        os.makedirs('data/audio2')
-
-
-def check_file():
-    away = {}
-    f = 'data/audio2/settings.json'
-    if not fileIO(f, 'check'):
-        print('Creating default settings.json...')
-        fileIO(f, 'save', away)
 
 def setup(bot):
     check_folders()

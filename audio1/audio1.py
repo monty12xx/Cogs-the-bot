@@ -1883,6 +1883,8 @@ class Audio:
         """Skips a song, using the set threshold if the requester isn't
         a mod or admin. Mods, admins and role owner are not counted in
         the vote threshold."""
+        db = fileIO(self.direct, "load")
+        musicrole = db[ctx.message.server.id]["musicrole"]
         hasrole = "reference"
         for i in ctx.message.author.roles:
             if i.id == musicrole:
@@ -1891,8 +1893,6 @@ class Audio:
             await self.bot.say("```you don't have permissions to skip songs ask owner to make a musicrole and give it to you if possible.```")
             return
         try:
-            db = fileIO(self.direct, "load")
-            musicrole = db[ctx.message.server.id]["musicrole"]
             if ctx.message.channel.permissions_for(ctx.message.author).manage_channels:
                 msg = ctx.message
                 server = ctx.message.server

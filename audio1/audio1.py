@@ -1883,7 +1883,6 @@ class Audio:
         """Skips a song, using the set threshold if the requester isn't
         a mod or admin. Mods, admins and role owner are not counted in
         the vote threshold."""
-        musicrole = db[ctx.message.server.id]["musicrole"]
         hasrole = "reference"
         for i in ctx.message.author.roles:
             if i.id == musicrole:
@@ -2045,7 +2044,6 @@ class Audio:
     @commands.command(pass_context=True, no_pm=True)
     async def song(self, ctx):
         """Info about the current song."""
-        musicrole = db[ctx.message.server.id]["musicrole"]
         hasrole = "reference"
         for i in ctx.message.author.roles:
             if i.id == musicrole:

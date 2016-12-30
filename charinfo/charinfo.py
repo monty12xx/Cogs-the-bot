@@ -1,12 +1,13 @@
 import discord
 from discord.ext import commands
+import unicodedata
 
 
 class charinfo:
     """charinfo emojis"""
     def __init__(self, bot):
         self.bot = bot
-        
+
     @commands.command()
     async def charinfo(self, *, characters: str):
         """Shows info about emojis numbers ,etc
@@ -25,7 +26,7 @@ class charinfo:
             return fmt.format(digit, name, c)
 
         await self.bot.say('\n'.join(map(to_string, characters)))
-        
+
 def setup(bot):
     n = charinfo(bot)
     bot.add_cog(n)

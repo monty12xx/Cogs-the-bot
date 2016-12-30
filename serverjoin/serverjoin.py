@@ -12,7 +12,7 @@ class Onjoin:
         self.bot = bot
     async def on_server_join(self, server):
         """says something when joins server"""
-        msg1 = "`-` thanks for adding me to adding me to {}\n`-`for a list of my commands do `%help`\n`-` for music create a role name it \'DJ' and do `%musicrole DJ` and give the role DJ to whoever you want to control the music. `%play <songname>` to reuqest a song\n`-` `%playlist add <playlist name> <url>` that will add a playlist that u can start any time by typing `%playlist start <playlistname>`\n`-` if anything is wrong with the __bot__ :robot:  please contact me using `%contact`\n`-` for modlogs :hammer: to set them just do `%modset` for a help\n`-` if you are using modlogs please kick and ban using the bot\n`-` for trivia games `%trivia <trivia>` to start one\n`-`Make sure to create a role and `%musicrole <rolename>` and give it to ppl who yoou want them to play music.\n`-` thanks for using v9 :heart:".format(server.name)
+        msg1 = "`-` thanks for adding me to adding me to {}\n`-`for a list of my commands do `%help`\n`-` if anything is wrong with the __bot__ :robot:  please contact me using `%contact`\n`-` for modlogs :hammer: to set them just do `%modset` for a help\n`-` if you are using modlogs please kick and ban using the `-` for trivia games `%trivia <trivia>` to start one\n`-`FeedBack And support here : http://tinyurl.com/hvuq4ah `-`\n `-` thanks for using v9 :heart:".format(server.name)
         await self.bot.send_message(server, msg1)
 
 def setup(bot):

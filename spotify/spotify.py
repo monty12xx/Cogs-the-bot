@@ -13,7 +13,7 @@ class spotify:
         b = 10
         results= sp.search(q=a, limit=b)
         for i, t in enumerate(results['tracks']['items']):
-            await self.bot.send_message(i, t['name'])
+            await self.bot.send_message(ctx.message.channel, i, t['name'])
 def setup(bot):
     n = spotify(bot)
     bot.add_cog(n)

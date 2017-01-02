@@ -13,7 +13,7 @@ class spotify:
         b = limit
         results= sp.search(q=a, limit=b)
         for i, t in enumerate(results['tracks']['items']):
-            await self.bot.say(' ', i, t['name'])
+            await self.bot.say(results, ['name'])
 def setup(bot):
     n = spotify(bot)
     bot.add_cog(n)

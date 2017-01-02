@@ -7,10 +7,11 @@ class spotify:
         self.bot = bot
 
     @commands.command(pass_context=True)
-    async def spotify(self,ctx, *, content):
+    async def spotify(self,ctx, *, content, limit):
         sp = spotipy.Spotify()
         a = content
-        results= sp.search(q=a, limit=10)
+        b = limit
+        results= sp.search(q=a, limit=b)
         for i, t in enumerate(results['tracks']['items']):
             await self.bot.say(' ', i, t['name'])
 def setup(bot):

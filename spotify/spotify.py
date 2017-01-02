@@ -12,7 +12,7 @@ class spotify:
         sp = spotipy.Spotify()
         a = content
         b = self.bot.say("how much songs?")
-        results= sp.search(q=a, limib=b)
+        results= sp.search(q=a, limit=b)
         for i, t in enumerate(results['tracks']['items']):
             self.bot.say(' ', i, t['name'])
 def setup(bot):

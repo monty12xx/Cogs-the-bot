@@ -7,7 +7,7 @@ class spotify:
         self.bot = bot
 
     @commands.command(pass_context=True)
-    async def spotify(self,ctx, *, content, limit):
+    async def spotify(self,ctx, *, content):
         sp = spotipy.Spotify()
         a = content
         b = limit

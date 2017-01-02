@@ -10,7 +10,7 @@ class spotify:
     async def spotify(self,ctx, *, content):
         sp = spotipy.Spotify()
         a = content
-        b = self.bot.say("how much songs?")
+        b = await self.bot.say("how much songs?")
         results= sp.search(q=a, limit=b)
         for i, t in enumerate(results['tracks']['items']):
             await self.bot.say(' ', i, t['name'])

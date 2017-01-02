@@ -10,7 +10,7 @@ class spotify:
     async def spotify(self,ctx, *, content):
         sp = spotipy.Spotify()
         a = content
-        b = limit
+        b = 10
         results= sp.search(q=a, limit=b)
         for i, t in enumerate(results['tracks']['items']):
             await self.bot.say(results, ['name'])

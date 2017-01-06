@@ -1624,7 +1624,7 @@ class Audio:
             log.debug("queueing to the actual queue for sid {}".format(
                 server.id))
             self._add_to_queue(server, url)
-        await self.bot.say("Queued.")
+        await self.bot.say("Queued {} ".format(song.title))
 
     async def _queue_list(self, ctx):
         """Not a command, use `queue` with no args to call this."""

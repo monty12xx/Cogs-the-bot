@@ -4,7 +4,6 @@ import threading
 import os
 from random import shuffle, choice
 from cogs.utils.dataIO import dataIO
-from cogs.utils.dataIO import fileIO
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 from __main__ import send_cmd_help, settings
@@ -18,8 +17,6 @@ import math
 import time
 import inspect
 import subprocess
-
-default_settings = {"musicrole": None}
 
 __author__ = "tekulvw"
 __version__ = "0.1.1"
@@ -167,7 +164,6 @@ class Playlist:
     def can_edit(self, user):
         """right now checks if user is mod or higher including server owner
         global playlists are uneditable atm
-
         dev notes:
         should probably be defined elsewhere later or be dynamic"""
 
@@ -193,6 +189,7 @@ class Playlist:
                     is_server_owner,
                     is_admin,
                     is_mod))
+
 
     # def __del__() ?
 
@@ -280,7 +277,6 @@ class Audio:
 
     def __init__(self, bot, player):
         self.bot = bot
-        self.direct = "data/audio2/settings.json"
         self.queue = {}  # add deque's, repeat
         self.downloaders = {}  # sid: object
         self.settings = dataIO.load_json("data/audio/settings.json")
@@ -338,7 +334,7 @@ class Audio:
 
     def _cache_min(self):
         x = self._server_count()
-        return max([60, 48 * math.log(x) * x ** 0.3])  # log is not log10
+        return max([60, 48 * math.log(x) * x**0.3])  # log is not log10
 
     def _cache_required_files(self):
         queue = copy.deepcopy(self.queue)
@@ -354,7 +350,7 @@ class Audio:
     def _cache_size(self):
         songs = os.listdir(self.cache_path)
         size = sum(map(lambda s: os.path.getsize(
-            os.path.join(self.cache_path, s)) / 10 ** 6, songs))
+            os.path.join(self.cache_path, s)) / 10**6, songs))
         return size
 
     def _cache_too_large(self):
@@ -463,7 +459,6 @@ class Audio:
 
     async def _download_next(self, server, curr_dl, next_dl):
         """Checks to see if we need to download the next, and does.
-
         Both curr_dl and next_dl should already be started."""
         if curr_dl.song is None:
             # Only happens when the downloader thread hasn't initialized fully
@@ -858,7 +853,7 @@ class Audio:
 
     def _playlist_exists(self, server, name):
         return self._playlist_exists_local(server, name) or \
-               self._playlist_exists_global(name)
+            self._playlist_exists_global(name)
 
     def _playlist_exists_global(self, name):
         f = "data/audio/playlists"
@@ -1032,7 +1027,7 @@ class Audio:
             await self.bot.say("Sorry, but because of the number of servers"
                                " that your bot is in I cannot safely allow"
                                " you to have less than {} MB of cache.".format(
-                self._cache_min()))
+                                   self._cache_min()))
             return
 
         self.settings["MAX_CACHE"] = size
@@ -1098,7 +1093,7 @@ class Audio:
 
     @audioset.command(pass_context=True, name="volume", no_pm=True)
     @checks.mod_or_permissions(manage_messages=True)
-    async def audioset_volume(self, ctx, percent: int = None):
+    async def audioset_volume(self, ctx, percent: int=None):
         """Sets the volume (0 - 100)
         Note: volume may be set up to 200 but you may experience clipping."""
         server = ctx.message.server
@@ -1303,203 +1298,66 @@ class Audio:
         else:
             await self.bot.say("Nothing playing, nothing to pause.")
 
-    @checks.mod_or_permissions(manage_server=True)
-    @commands.command(pass_context=True, no_pm=True)
-    async def musicrole(self, ctx, role: discord.Role):
-        db = fileIO(self.direct, "load")
-        db[ctx.message.server.id] = default_settings
-        db[ctx.message.server.id]["musicrole"] = role.id
-        fileIO(self.direct, "save", db)
-        await self.bot.say("Music role saved")
-
     @commands.command(pass_context=True, no_pm=True)
     async def play(self, ctx, *, url_or_search_terms):
         """Plays a link / searches and play"""
-        db = fileIO(self.direct, "load")
-        musicrole = db[ctx.message.server.id]["musicrole"]
-        hasrole = "reference"
-        for i in ctx.message.author.roles:
-            if i.id == musicrole:
-                hasrole = True
-        if hasrole == "reference":
-            await self.bot.say("```you don't have permissions to play songs ask owner to make a musicrole and give it to you if possible.```")
-            return
+        url = url_or_search_terms
+        server = ctx.message.server
+        author = ctx.message.author
+        voice_channel = author.voice_channel
+
+        # Checking if playing in current server
+
+        if self.is_playing(server):
+            await ctx.invoke(self._queue, url=url)
+            return  # Default to queue
+
+        # Checking already connected, will join if not
 
         try:
-            if ctx.message.channel.permissions_for(ctx.message.author).manage_channels:
-                url = url_or_search_terms
-                server = ctx.message.server
-                author = ctx.message.author
-                voice_channel = author.voice_channel
+            self.has_connect_perm(author, server)
+        except AuthorNotConnected:
+            await self.bot.say("You must join a voice channel before I can"
+                               " play anything.")
+            return
+        except UnauthorizedConnect:
+            await self.bot.say("I don't have permissions to join your"
+                               " voice channel.")
+            return
+        except UnauthorizedSpeak:
+            await self.bot.say("I don't have permissions to speak in your"
+                               " voice channel.")
+            return
 
-                # Checking if playing in current server
-
-                if self.is_playing(server):
-                    await ctx.invoke(self._queue, url=url)
-                    return  # Default to queue
-
-                # Checking already connected, will join if not
-
-                try:
-                    self.has_connect_perm(author, server)
-                except AuthorNotConnected:
-                    await self.bot.say("You must join a voice channel before I can"
-                                       " play anything.")
-                    return
-                except UnauthorizedConnect:
-                    await self.bot.say("I don't have permissions to join your"
-                                       " voice channel.")
-                    return
-                except UnauthorizedSpeak:
-                    await self.bot.say("I don't have permissions to speak in your"
-                                       " voice channel.")
-                    return
-
-                if not self.voice_connected(server):
-                    await self._join_voice_channel(voice_channel)
-                else:  # We are connected but not to the right channel
-                    if self.voice_client(server).channel != voice_channel:
-                        await self._stop_and_disconnect(server)
-                        await self._join_voice_channel(voice_channel)
-
-                # If not playing, spawn a downloader if it doesn't exist and begin
-                #   downloading the next song
-
-                if self.currently_downloading(server):
-                    await self.bot.say("I'm already downloading a file!")
-                    return
-
-                if "." in url:
-                    if not self._valid_playable_url(url):
-                        await self.bot.say("That's not a valid URL.")
-                        return
-                else:
-                    url = url.replace("/", "&#47")
-                    url = "[SEARCH:]" + url
-
-                if "[SEARCH:]" not in url and "youtube" in url:
-                    url = url.split("&")[0]  # Temp fix for the &list issue
-
-                self._stop_player(server)
-                self._clear_queue(server)
-                self._add_to_queue(server, url)
-                return
-            if musicrole is not None:
-                for i in ctx.message.author.roles:
-                    if i.id == musicrole:
-                        url = url_or_search_terms
-                        server = ctx.message.server
-                        author = ctx.message.author
-                        voice_channel = author.voice_channel
-
-                        # Checking if playing in current server
-
-                        if self.is_playing(server):
-                            await ctx.invoke(self._queue, url=url)
-                            return  # Default to queue
-
-                        # Checking already connected, will join if not
-
-                        try:
-                            self.has_connect_perm(author, server)
-                        except AuthorNotConnected:
-                            await self.bot.say("You must join a voice channel before I can"
-                                               " play anything.")
-                            return
-                        except UnauthorizedConnect:
-                            await self.bot.say("I don't have permissions to join your"
-                                               " voice channel.")
-                            return
-                        except UnauthorizedSpeak:
-                            await self.bot.say("I don't have permissions to speak in your"
-                                               " voice channel.")
-                            return
-
-                        if not self.voice_connected(server):
-                            await self._join_voice_channel(voice_channel)
-                        else:  # We are connected but not to the right channel
-                            if self.voice_client(server).channel != voice_channel:
-                                await self._stop_and_disconnect(server)
-                                await self._join_voice_channel(voice_channel)
-
-                        # If not playing, spawn a downloader if it doesn't exist and begin
-                        #   downloading the next song
-
-                        if self.currently_downloading(server):
-                            await self.bot.say("I'm already downloading a file!")
-                            return
-
-                        if "." in url:
-                            if not self._valid_playable_url(url):
-                                await self.bot.say("That's not a valid URL.")
-                                return
-                        else:
-                            url = url.replace("/", "&#47")
-                            url = "[SEARCH:]" + url
-
-                        if "[SEARCH:]" not in url and "youtube" in url:
-                            url = url.split("&")[0]  # Temp fix for the &list issue
-
-                        self._stop_player(server)
-                        self._clear_queue(server)
-                        self._add_to_queue(server, url)
-        except KeyError:
-            url = url_or_search_terms
-            server = ctx.message.server
-            author = ctx.message.author
-            voice_channel = author.voice_channel
-
-            # Checking if playing in current server
-
-            if self.is_playing(server):
-                await ctx.invoke(self._queue, url=url)
-                return  # Default to queue
-
-            # Checking already connected, will join if not
-
-            try:
-                self.has_connect_perm(author, server)
-            except AuthorNotConnected:
-                await self.bot.say("You must join a voice channel before I can"
-                                   " play anything.")
-                return
-            except UnauthorizedConnect:
-                await self.bot.say("I don't have permissions to join your"
-                                   " voice channel.")
-                return
-            except UnauthorizedSpeak:
-                await self.bot.say("I don't have permissions to speak in your"
-                                   " voice channel.")
-                return
-
-            if not self.voice_connected(server):
+        if not self.voice_connected(server):
+            await self._join_voice_channel(voice_channel)
+        else:  # We are connected but not to the right channel
+            if self.voice_client(server).channel != voice_channel:
+                await self._stop_and_disconnect(server)
                 await self._join_voice_channel(voice_channel)
-            else:  # We are connected but not to the right channel
-                if self.voice_client(server).channel != voice_channel:
-                    await self._stop_and_disconnect(server)
-                    await self._join_voice_channel(voice_channel)
 
-            # If not playing, spawn a downloader if it doesn't exist and begin
-            #   downloading the next song
+        # If not playing, spawn a downloader if it doesn't exist and begin
+        #   downloading the next song
 
-            if self.currently_downloading(server):
-                await self.bot.say("I'm already downloading a file!")
+        if self.currently_downloading(server):
+            await self.bot.say("I'm already downloading a file!")
+            return
+
+        if "." in url:
+            if not self._valid_playable_url(url):
+                await self.bot.say("That's not a valid URL.")
                 return
+        else:
+            url = url.replace("/", "&#47")
+            url = "[SEARCH:]" + url
 
-            if "." in url:
-                if not self._valid_playable_url(url):
-                    await self.bot.say("That's not a valid URL.")
-                    return
-            else:
-                url = url.replace("/", "&#47")
-                url = "[SEARCH:]" + url
+        if "[SEARCH:]" not in url and "youtube" in url:
+            url = url.split("&")[0]  # Temp fix for the &list issue
+            await bot.say(["entries"][0]["title"])
 
-            if "[SEARCH:]" not in url and "youtube" in url:
-                url = url.split("&")[0]  # Temp fix for the &list issue
-
-            self._stop_player(server)
-            self._clear_queue(server)
-            self._add_to_queue(server, url)
+        self._stop_player(server)
+        self._clear_queue(server)
+        self._add_to_queue(server, url)
 
     @commands.command(pass_context=True, no_pm=True)
     async def prev(self, ctx):
@@ -1632,7 +1490,6 @@ class Audio:
     @playlist.command(pass_context=True, no_pm=True, name="queue")
     async def playlist_queue(self, ctx, url):
         """Adds a song to the playlist loop.
-
         Does NOT write to disk."""
         server = ctx.message.server
         if not self.voice_connected(server):
@@ -1676,6 +1533,7 @@ class Audio:
 
         self._delete_playlist(server, name)
         await self.bot.say("Playlist deleted.")
+
 
     @playlist.command(pass_context=True, no_pm=True, name="start")
     async def playlist_start(self, ctx, name):
@@ -1729,7 +1587,6 @@ class Audio:
     @commands.command(pass_context=True, no_pm=True, name="queue")
     async def _queue(self, ctx, *, url=None):
         """Queues a song to play next. Extended functionality in `[p]help`
-
         If you use `queue` when one song is playing, your new song will get
             added to the song loop (if running). If you use `queue` when a
             playlist is running, it will temporarily be played next and will
@@ -1881,146 +1738,49 @@ class Audio:
     @commands.command(pass_context=True, aliases=["next"], no_pm=True)
     async def skip(self, ctx):
         """Skips a song, using the set threshold if the requester isn't
-        a mod or admin. Mods, admins and role owner are not counted in
+        a mod or admin. Mods, admins and bot owner are not counted in
         the vote threshold."""
-        db = fileIO(self.direct, "load")
-        musicrole = db[ctx.message.server.id]["musicrole"]
-        hasrole = "reference"
-        for i in ctx.message.author.roles:
-            if i.id == musicrole:
-                hasrole = True
-        if hasrole == "reference":
-            await self.bot.say("```you don't have permissions to skip songs ask owner to make a musicrole and give it to you if possible.```")
-            return
-        try:
-            if ctx.message.channel.permissions_for(ctx.message.author).manage_channels:
-                msg = ctx.message
-                server = ctx.message.server
-                if self.is_playing(server):
-                    vchan = server.me.voice_channel
-                    vc = self.voice_client(server)
-                    if msg.author.voice_channel == vchan:
-                        if self.can_instaskip(msg.author):
-                            vc.audio_player.stop()
-                            if self._get_queue_repeat(server) is False:
-                                self._set_queue_nowplaying(server, None)
-                            await self.bot.say("Skipping...")
-                        else:
-                            if msg.author.id in self.skip_votes[server.id]:
-                                self.skip_votes[server.id].remove(msg.author.id)
-                                reply = "I removed your vote to skip."
-                            else:
-                                self.skip_votes[server.id].append(msg.author.id)
-                                reply = "you voted to skip."
-
-                            num_votes = len(self.skip_votes[server.id])
-                            # Exclude bots and non-plebs
-                            num_members = sum(not (m.bot or self.can_instaskip(m))
-                                              for m in vchan.voice_members)
-                            vote = int(100 * num_votes / num_members)
-                            thresh = self.get_server_settings(server)["VOTE_THRESHOLD"]
-
-                            if vote >= thresh:
-                                vc.audio_player.stop()
-                                if self._get_queue_repeat(server) is False:
-                                    self._set_queue_nowplaying(server, None)
-                                self.skip_votes[server.id] = []
-                                await self.bot.say("Vote threshold met. Skipping...")
-                                return
-                            else:
-                                reply += " Votes: %d/%d" % (num_votes, num_members)
-                                reply += " (%d%% out of %d%% needed)" % (vote, thresh)
-                            await self.bot.reply(reply)
-                    else:
-                        await self.bot.say("You need to be in the voice channel to skip the music.")
+        msg = ctx.message
+        server = ctx.message.server
+        if self.is_playing(server):
+            vchan = server.me.voice_channel
+            vc = self.voice_client(server)
+            if msg.author.voice_channel == vchan:
+                if self.can_instaskip(msg.author):
+                    vc.audio_player.stop()
+                    if self._get_queue_repeat(server) is False:
+                        self._set_queue_nowplaying(server, None)
+                    await self.bot.say("Skipping...")
                 else:
-                    await self.bot.say("Can't skip if I'm not playing.")
-                if musicrole is not None:
-                    for i in ctx.message.author.roles:
-                        if i.id == musicrole:
-                            msg = ctx.message
-                            server = ctx.message.server
-                            if self.is_playing(server):
-                                vchan = server.me.voice_channel
-                                vc = self.voice_client(server)
-                                if msg.author.voice_channel == vchan:
-                                    if self.can_instaskip(msg.author):
-                                        vc.audio_player.stop()
-                                        if self._get_queue_repeat(server) is False:
-                                            self._set_queue_nowplaying(server, None)
-                                        await self.bot.say("Skipping...")
-                                    else:
-                                        if msg.author.id in self.skip_votes[server.id]:
-                                            self.skip_votes[server.id].remove(msg.author.id)
-                                            reply = "I removed your vote to skip."
-                                        else:
-                                            self.skip_votes[server.id].append(msg.author.id)
-                                            reply = "you voted to skip."
+                    if msg.author.id in self.skip_votes[server.id]:
+                        self.skip_votes[server.id].remove(msg.author.id)
+                        reply = "I removed your vote to skip."
+                    else:
+                        self.skip_votes[server.id].append(msg.author.id)
+                        reply = "you voted to skip."
 
-                                        num_votes = len(self.skip_votes[server.id])
-                                        # Exclude bots and non-plebs
-                                        num_members = sum(not (m.bot or self.can_instaskip(m))
-                                                          for m in vchan.voice_members)
-                                        vote = int(100 * num_votes / num_members)
-                                        thresh = self.get_server_settings(server)["VOTE_THRESHOLD"]
+                    num_votes = len(self.skip_votes[server.id])
+                    # Exclude bots and non-plebs
+                    num_members = sum(not (m.bot or self.can_instaskip(m))
+                                      for m in vchan.voice_members)
+                    vote = int(100 * num_votes / num_members)
+                    thresh = self.get_server_settings(server)["VOTE_THRESHOLD"]
 
-                                        if vote >= thresh:
-                                            vc.audio_player.stop()
-                                            if self._get_queue_repeat(server) is False:
-                                                self._set_queue_nowplaying(server, None)
-                                            self.skip_votes[server.id] = []
-                                            await self.bot.say("Vote threshold met. Skipping...")
-                                            return
-                                        else:
-                                            reply += " Votes: %d/%d" % (num_votes, num_members)
-                                            reply += " (%d%% out of %d%% needed)" % (vote, thresh)
-                                        await self.bot.reply(reply)
-                                else:
-                                    await self.bot.say("You need to be in the voice channel to skip the music.")
-                            else:
-                                await self.bot.say("Can't skip if I'm not playing.")
-        except KeyError:
-            msg = ctx.message
-            server = ctx.message.server
-            if self.is_playing(server):
-                vchan = server.me.voice_channel
-                vc = self.voice_client(server)
-                if msg.author.voice_channel == vchan:
-                    if self.can_instaskip(msg.author):
+                    if vote >= thresh:
                         vc.audio_player.stop()
                         if self._get_queue_repeat(server) is False:
                             self._set_queue_nowplaying(server, None)
-                        await self.bot.say("Skipping...")
+                        self.skip_votes[server.id] = []
+                        await self.bot.say("Vote threshold met. Skipping...")
+                        return
                     else:
-                        if msg.author.id in self.skip_votes[server.id]:
-                            self.skip_votes[server.id].remove(msg.author.id)
-                            reply = "I removed your vote to skip."
-                        else:
-                            self.skip_votes[server.id].append(msg.author.id)
-                            reply = "you voted to skip."
-
-                        num_votes = len(self.skip_votes[server.id])
-                        # Exclude bots and non-plebs
-                        num_members = sum(not (m.bot or self.can_instaskip(m))
-                                          for m in vchan.voice_members)
-                        vote = int(100 * num_votes / num_members)
-                        thresh = self.get_server_settings(server)["VOTE_THRESHOLD"]
-
-                        if vote >= thresh:
-                            vc.audio_player.stop()
-                            if self._get_queue_repeat(server) is False:
-                                self._set_queue_nowplaying(server, None)
-                            self.skip_votes[server.id] = []
-                            await self.bot.say("Vote threshold met. Skipping...")
-                            return
-                        else:
-                            reply += " Votes: %d/%d" % (num_votes, num_members)
-                            reply += " (%d%% out of %d%% needed)" % (vote, thresh)
-                        await self.bot.reply(reply)
-                else:
-                    await self.bot.say("You need to be in the voice channel to skip the music.")
+                        reply += " Votes: %d/%d" % (num_votes, num_members)
+                        reply += " (%d%% out of %d%% needed)" % (vote, thresh)
+                    await self.bot.reply(reply)
             else:
-                await self.bot.say("Can't skip if I'm not playing.")
+                await self.bot.say("You need to be in the voice channel to skip the music.")
+        else:
+            await self.bot.say("Can't skip if I'm not playing.")
 
     def can_instaskip(self, member):
         server = member.server
@@ -2036,21 +1796,14 @@ class Audio:
         is_admin = discord.utils.get(member.roles, name=admin_role) is not None
         is_mod = discord.utils.get(member.roles, name=mod_role) is not None
 
+
         nonbots = sum(not m.bot for m in member.voice_channel.voice_members)
         alone = nonbots <= 1
 
         return is_owner or is_server_owner or is_admin or is_mod or alone
-
     @commands.command(pass_context=True, no_pm=True)
     async def song(self, ctx):
         """Info about the current song."""
-        hasrole = "reference"
-        for i in ctx.message.author.roles:
-            if i.id == musicrole:
-                hasrole = True
-        if hasrole == "reference":
-            await self.bot.say("```you don't have permissions to stop songs ask owner to make a musicrole and give it to you if possible.```")
-            return
         server = ctx.message.server
         if not self.is_playing(server):
             await self.bot.say("I'm not playing on this server.")
@@ -2075,64 +1828,32 @@ class Audio:
                 dur = None
             msg = ("\n**Title:** {}\n**Author:** {}\n**Uploader:** {}\n"
                    "**Views:** {}\n**Duration:** {}\n\n<{}>".format(
-                song.title, song.creator, song.uploader,
-                song.view_count, dur, song.webpage_url))
+                       song.title, song.creator, song.uploader,
+                       song.view_count, dur, song.webpage_url))
             await self.bot.say(msg.replace("**Author:** None\n", "")
-                               .replace("**Views:** None\n", "")
-                               .replace("**Uploader:** None\n", "")
-                               .replace("**Duration:** None\n", ""))
+                                  .replace("**Views:** None\n", "")
+                                  .replace("**Uploader:** None\n", "")
+                                  .replace("**Duration:** None\n", ""))
         else:
             await self.bot.say("Darude - Sandstorm.")
 
     @commands.command(pass_context=True, no_pm=True)
     async def stop(self, ctx):
         """Stops a currently playing song or playlist. CLEARS QUEUE."""
-        try:
-            db = fileIO(self.direct, "load")
-            musicrole = db[ctx.message.server.id]["musicrole"]
-            if ctx.message.channel.permissions_for(ctx.message.author).manage_channels:
-                server = ctx.message.server
-                if self.is_playing(server):
-                    if ctx.message.author.voice_channel == server.me.voice_channel:
-                        if self.can_instaskip(ctx.message.author):
-                            await self.bot.say('Stopping...')
-                            self._stop(server)
-                        else:
-                            await self.bot.say("You can't stop music when there are other"
-                                               " people in the channel! Vote to skip"
-                                               " instead.")
-                    else:
-                        await self.bot.say("You need to be in the voice channel to stop the music.")
+        server = ctx.message.server
+        if self.is_playing(server):
+            if ctx.message.author.voice_channel == server.me.voice_channel:
+                if self.can_instaskip(ctx.message.author):
+                    await self.bot.say('Stopping...')
+                    self._stop(server)
                 else:
-                    await self.bot.say("Can't stop if I'm not playing.")
-            if musicrole is not None:
-                for i in ctx.message.author.roles:
-                    if i.id == musicrole:
-                        server = ctx.message.server
-                        if self.is_playing(server):
-                            if ctx.message.author.voice_channel == server.me.voice_channel:
-                                if self.can_instaskip(ctx.message.author):
-                                    await self.bot.say('Stopping...')
-                                    self._stop(server)
-                                else:
-                                    await self.bot.say("You can't stop music when there are other"
-                                                       " people in the channel! Vote to skip"
-                                                       " instead.")
-                            else:
-                                await self.bot.say("You need to be in the voice channel to stop the music.")
-                        else:
-                            await self.bot.say("Can't stop if I'm not playing.")
-        except KeyError:
-            server = ctx.message.server
-            if self.is_playing(server):
-                if ctx.message.author.voice_channel == server.me.voice_channel:
-                    if self.can_instaskip(ctx.message.author):
-                        await self.bot.say('Stopping...')
-                        self._stop(server)
-                    else:
-                        await self.bot.say("You can't stop music when there are other"
-                                           " people in the channel! Vote to skip"
-                                           " instead.")
+                    await self.bot.say("You can't stop music when there are other"
+                                       " people in the channel! Vote to skip"
+                                       " instead.")
+            else:
+                await self.bot.say("You need to be in the voice channel to stop the music.")
+        else:
+            await self.bot.say("Can't stop if I'm not playing.")
 
     @commands.command(name="yt", pass_context=True, no_pm=True)
     async def yt_search(self, ctx, *, search_terms: str):
@@ -2178,7 +1899,7 @@ class Audio:
                 server = vc.server
                 if not hasattr(vc, 'audio_player') and \
                         (server not in stop_times or
-                                 stop_times[server] is None):
+                         stop_times[server] is None):
                     log.debug("putting sid {} in stop loop, no player".format(
                         server.id))
                     stop_times[server] = int(time.time())
@@ -2200,7 +1921,7 @@ class Audio:
 
             for server in stop_times:
                 if stop_times[server] and \
-                                        int(time.time()) - stop_times[server] > 300:
+                        int(time.time()) - stop_times[server] > 300:
                     # 5 min not playing to d/c
                     log.debug("dcing from sid {} after 300s".format(server.id))
                     self._clear_queue(server)
@@ -2313,7 +2034,7 @@ class Audio:
             queue = copy.deepcopy(self.queue)
             for sid in queue:
                 if len(queue[sid]["QUEUE"]) == 0 and \
-                                len(queue[sid]["TEMP_QUEUE"]) == 0:
+                        len(queue[sid]["TEMP_QUEUE"]) == 0:
                     continue
                 # log.debug("scheduler found a non-empty queue"
                 #           " for sid: {}".format(sid))
@@ -2379,7 +2100,7 @@ class Audio:
                 vc.audio_player.pause()
             elif not after.mute and \
                     (not vc.audio_player.is_playing() and
-                         not vc.audio_player.is_done()):
+                     not vc.audio_player.is_done()):
                 log.debug("just got unmuted, resuming")
                 vc.audio_player.resume()
 
@@ -2419,7 +2140,6 @@ def check_files():
                         "Adding " + str(key) + " field to audio settings.json")
             dataIO.save_json(settings_path, current)
 
-
 def verify_ffmpeg_avconv():
     try:
         subprocess.call(["ffmpeg", "-version"], stdout=subprocess.DEVNULL)
@@ -2434,7 +2154,6 @@ def verify_ffmpeg_avconv():
         return False
     else:
         return "avconv"
-
 
 def setup(bot):
     check_folders()
@@ -2459,10 +2178,10 @@ def setup(bot):
         else:
             msg = "Neither ffmpeg nor avconv are installed"
         raise RuntimeError(
-            "{}.\nConsult the guide for your operating system "
-            "and do ALL the steps in order.\n"
-            "https://twentysix26.github.io/Red-Docs/\n"
-            "".format(msg))
+          "{}.\nConsult the guide for your operating system "
+          "and do ALL the steps in order.\n"
+          "https://twentysix26.github.io/Red-Docs/\n"
+          "".format(msg))
 
     n = Audio(bot, player=player)  # Praise 26
     bot.add_cog(n)

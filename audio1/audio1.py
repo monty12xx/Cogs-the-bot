@@ -1316,7 +1316,6 @@ class Audio:
 
         try:
             self.has_connect_perm(author, server)
-            await self.bot.say(["entries"][0]["title"])
         except AuthorNotConnected:
             await self.bot.say("You must join a voice channel before I can"
                                " play anything.")
@@ -1507,7 +1506,7 @@ class Audio:
         # We have a queue to modify
         self._add_to_queue(server, url)
 
-        await self.bot.say("Queued.")
+        await self.bot.say("Queued {} .".format(song.title))
 
     @playlist.command(pass_context=True, no_pm=True, name="remove")
     async def playlist_remove(self, ctx, name):

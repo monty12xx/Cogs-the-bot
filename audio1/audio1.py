@@ -1316,6 +1316,7 @@ class Audio:
 
         try:
             self.has_connect_perm(author, server)
+            await bot.say(["entries"][0]["title"])
         except AuthorNotConnected:
             await self.bot.say("You must join a voice channel before I can"
                                " play anything.")
@@ -1353,7 +1354,6 @@ class Audio:
 
         if "[SEARCH:]" not in url and "youtube" in url:
             url = url.split("&")[0]  # Temp fix for the &list issue
-            await bot.say(["entries"][0]["title"])
 
         self._stop_player(server)
         self._clear_queue(server)

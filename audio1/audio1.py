@@ -1316,7 +1316,7 @@ class Audio:
 
         try:
             self.has_connect_perm(author, server)
-            await bot.say(["entries"][0]["title"])
+            await self.bot.say(["entries"][0]["title"])
         except AuthorNotConnected:
             await self.bot.say("You must join a voice channel before I can"
                                " play anything.")

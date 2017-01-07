@@ -91,7 +91,7 @@ class Statistics:
         text_channels = 0
         voice_channels = 0
         owner = '`тeddy#7385'
-        changelog = "**NaN**"
+        changelog = "**Improved music , audio , playlist support- Planned**"
 
         cpu_p = psutil.cpu_percent(interval=None, percpu=True)
         cpu_usage = sum(cpu_p)/len(cpu_p)

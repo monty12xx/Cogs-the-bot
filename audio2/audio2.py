@@ -23,20 +23,7 @@ class VoiceEntry:
         if duration:
             fmt = fmt + ' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60))
         return fmt.format(self.player, self.requester)
-    def embed(self):
-        data = discord.Embed(
-            color=discord.Color(value="16727871"),
-            description=self.player.webpage_url
-        )
-        duration = self.player.duration
-        data.add_field(name="Uploaded by", value=self.player.uploader)
-        data.add_field(name="Requested by", value=self.requester.display_name)
-        if duration:
-            data.add_field(name="Duration", value='{0[0]}m {0[1]}s'.format(
-                divmod(duration, 60)))
-        data.set_author(name=self.player.title, url=self.player.webpage_url)
-        data.set_thumbnail(url=self.player.thumbnail)
-        return data
+    
 
 class VoiceState:
     def __init__(self, bot):
@@ -74,8 +61,7 @@ class VoiceState:
         while True:
             self.play_next_song.clear()
             self.current = await self.songs.get()
-            await self.bot.send_message(self.current.channel, 'Now playing ')
-            await self.bot.send_message(self.current.channel, embed=self.current.embed())
+            await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
             self.current.player.start()
             await self.play_next_song.wait()
 

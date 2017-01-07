@@ -25,15 +25,19 @@ class VoiceEntry:
         return fmt.format(self.player, self.requester)
 
 class VoiceState:
-    def __init__(self, bot):
+    def __init__(self, bot, cog):
+        self.volume = 0.6
+        self.stop = False
         self.current = None
         self.voice = None
         self.bot = bot
+        self.cog = cog
         self.play_next_song = asyncio.Event()
         self.songs = asyncio.Queue()
-        self.skip_votes = set() # a set of user_ids that voted
-        self.audio_player = self.bot.loop.create_task(self.audio_player_task())
         self.songlist = []
+        self.skip_votes = set()
+        self.audio_player = self.bot.loop.create_task(self.audio_player_task())
+        self.Extract = Extract()
 
     def is_playing(self):
         if self.voice is None or self.current is None:

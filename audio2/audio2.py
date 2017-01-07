@@ -18,7 +18,7 @@ class VoiceEntry:
         self.player = player
 
     def __str__(self):
-        fmt = discord.Embed(color=discord.Color, title=Enqueued, description='*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}')
+        fmt = discord.Embed(color=discord.Color, title='Enqueud', description='*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}')
         duration = self.player.duration
         if duration:
             fmt.add_field(name='length', value=' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60)))

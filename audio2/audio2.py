@@ -18,12 +18,15 @@ class VoiceEntry:
         self.player = player
 
     def __str__(self):
+        em = discord.Embed(discord.Color.purple())
+        em.add_field(name='enqueued', value= fmt)
+        em.add_field(name='Duration', value = duration)
         fmt = '*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}'
         duration = self.player.duration
         if duration:
             fmt = fmt + ' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60))
         return fmt.format(self.player, self.requester)
-    
+
 
 class VoiceState:
     def __init__(self, bot):

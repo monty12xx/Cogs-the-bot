@@ -34,6 +34,7 @@ class VoiceEntry:
         self.requester = message.author
         self.channel = message.channel
         self.player = player
+        self.songlist = []
 
     def __str__(self):
         fmt = '*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}'

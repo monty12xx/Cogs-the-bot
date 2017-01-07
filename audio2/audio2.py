@@ -18,12 +18,11 @@ class VoiceEntry:
         self.player = player
 
     def __str__(self):
-        fmt = discord.Embed(color=discord.Color, title='Enqueud', description='*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}')
+        fmt = '*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}'
         duration = self.player.duration
         if duration:
-            fmt.add_field(name='length', value=' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60)))
+            fmt = fmt + ' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60))
         return fmt.format(self.player, self.requester)
-
 
 class VoiceState:
     def __init__(self, bot):
@@ -37,6 +36,7 @@ class VoiceState:
         self.songlist = []
         self.skip_votes = set()
         self.audio_player = self.bot.loop.create_task(self.audio_player_task())
+
 
     def is_playing(self):
         if self.voice is None or self.current is None:

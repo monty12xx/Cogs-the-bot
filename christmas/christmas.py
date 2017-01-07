@@ -1,3 +1,16 @@
+import discord
+from discord.ext import commands
+import random as randchoice
+
+class server:
+    """moves a user from a channel to another one"""
+
+    def __init__(self, bot):
+        self.bot = bot    
+    
+    
+    
+    
     @commands.command(pass_context=True, no_pm=True)
     async def serverinfo(self, ctx):
         """Shows server's informations"""
@@ -54,3 +67,6 @@
         except:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this")
+def setup(bot):
+    n = server(bot)
+    bot.add_cog(n)            

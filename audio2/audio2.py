@@ -18,25 +18,11 @@ class VoiceEntry:
         self.player = player
 
     def __str__(self):
-        fmt = '*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}'
+        fmt = discord.Embed(color=discord.Color, title=Enqueued, description='*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}')
         duration = self.player.duration
         if duration:
-            fmt = fmt + ' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60))
+            fmt.add_field(name='length', value=' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60)))
         return fmt.format(self.player, self.requester)
-    def embed(self):
-        data = discord.Embed(
-            color=discord.Color(value="16727871"),
-            description=self.player.webpage_url
-        )
-        duration = self.player.duration
-        data.add_field(name="Uploaded by", value=self.player.uploader)
-        data.add_field(name="Requested by", value=self.requester.display_name)
-        if duration:
-            data.add_field(name="Duration", value='{0[0]}m {0[1]}s'.format(
-                divmod(duration, 60)))
-        data.set_author(name=self.player.title, url=self.player.webpage_url)
-        data.set_thumbnail(url=self.player.thumbnail)
-        return data
 
 
 class VoiceState:
@@ -71,53 +57,13 @@ class VoiceState:
     def toggle_next(self):
         self.bot.loop.call_soon_threadsafe(self.play_next_song.set)
 
-
-    async def create_player(self):
-        entry = self.current
-        # args = 'cache/{}.mp3'.format(entry.display_id)
-        await self.Extract.download(entry.player.webpage_url)
-        args = glob.glob('cache/{}.*'.format(entry.player.display_id))[0]
-        player = self.voice.create_ffmpeg_player(args, after=self.toggle_next)
-
-        # TODO: find a way to iterate over this using getattr and setattr
-        player.yt = entry.player.yt
-        player.title = entry.player.title
-        player.display_id = entry.player.display_id
-        player.thumbnail = entry.player.thumbnail
-        player.webpage_url = entry.player.webpage_url
-        player.download_url = entry.player.download_url
-        player.views = entry.player.views
-        player.is_live = entry.player.is_live
-        player.likes = entry.player.likes
-        player.dislikes = entry.player.dislikes
-        player.duration = entry.player.duration
-        player.uploader = entry.player.uploader
-
-        return player
-
     async def audio_player_task(self):
         while True:
-            self.current = await self.songs.get()
-            self.current.player = await self.create_player()
             self.play_next_song.clear()
-            try:
-                if not self.stop:
-                    await self.bot.send_message(self.current.channel, "Now playing")
-                    await self.bot.send_message(self.current.channel, embed=self.current.embed())
-                self.songlist.pop(0)
-            except:
-                pass
-            self.current.player.volume = self.volume
+            self.current = await self.songs.get()
+            await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
             self.current.player.start()
             await self.play_next_song.wait()
-            if not self.songs.empty() or len(self.voice.channel.voice_members) < 2:
-                if self.current.requester.voice_channel is not None:
-                    await self.voice.move_to(self.current.requester.voice_channel)
-                else:
-                    await self.disconnect()
-            else:
-                await self.disconnect()
-                return
 
 class Music:
     """Voice related commands.

@@ -36,7 +36,6 @@ class VoiceState:
         self.songlist = []
         self.skip_votes = set()
         self.audio_player = self.bot.loop.create_task(self.audio_player_task())
-        self.Extract = Extract()
 
     def is_playing(self):
         if self.voice is None or self.current is None:

@@ -1,25 +1,39 @@
-import requests
 import json
 import discord
 from discord.ext import commands
+import aiohttp
 from cogs.utils import checks
 
-class updateservers:
-    """updateservers"""
-
+class Discordlist:
     def __init__(self, bot):
         self.bot = bot
-
     @checks.is_owner()
-    @commands.command()
-    async def updateservers(self):
-        """updateservers"""
-        thepostdata ={
-            "server_count": int(len(self.bot.servers))
+    @commands.command(pass_context=True)
+    async def dlist(self, ctx):
+        data = {
+            "token" : 'XgoA1YxWUf',
+            "servers" : len(bot.servers)
         }
-        r = requests.post("https://bots.discord.pw/api/bots/234179578229293057/stats", headers={'Authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiIyMDM2NDk2NjE2MTE4MDI2MjQiLCJyYW5kIjoxMTAsImlhdCI6MTQ4MjMyNzgzN30.V0Gs1xlGM4ObeX9LfSYzyJwicxuQUvom81r1xptCjKk', 'Content-Type' : 'application/json'}, data=json.dumps(thepostdata))
-        await self.bot.say(r.content.decode('utf-8'))
-        await self.bot.change_presence(game=discord.Game(name="%help | {} servers \U00002764".format(len(self.bot.servers))))
+        url = "https://bots.discordlist.net/api.php"
+        resp = await.aiohttp.post(url, data=data)
+        resp.close()
+        await self.bot.say(url.encode(encoding='utf-8'))
+
 
 def setup(bot):
-    bot.add_cog(updateservers(bot))
+    n = Discordlist(bot)
+    bot.add_cog(n)
+
+
+
+
+
+
+
+
+
+
+
+
+
+

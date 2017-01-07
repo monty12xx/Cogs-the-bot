@@ -1,282 +1,182 @@
+from cogs.utils.dataIO import dataIO
+from discord.ext import commands
+from .utils import checks
+import datetime
 import asyncio
 import discord
-from discord.ext import commands
-import youtube_dl
+import time
+import os
+
+try:
+    import psutil
+except:
+    psutil = False
 
 
-
-youtube_dl_options = {
-    'source_address': '0.0.0.0',
-    'format': 'bestaudio/best',
-    'extractaudio': True,
-    'audioformat': "mp3",
-    'outtmpl': '%(id)s',
-    'noplaylist': True,
-    'nocheckcertificate': True,
-    'ignoreerrors': True,
-    'quiet': True,
-    'no_warnings': True,
-    'outtmpl': "data/audio/cache/%(id)s",
-    'default_search': 'auto'
-}
-
-if not discord.opus.is_loaded():
-    # the 'opus' library here is opus.dll on windows
-    # or libopus.so on linux in the current directory
-    # you should replace this with the location the
-    # opus library is located in and with the proper filename.
-    # note that on windows this DLL is automatically provided for you
-    discord.opus.load_opus('opus')
-
-class VoiceEntry:
-    def __init__(self, message, player):
-        self.requester = message.author
-        self.channel = message.channel
-        self.player = player
-
-    def __str__(self):
-        fmt = '*{0.title}* uploaded by {0.uploader} and requested by {1.display_name}'
-        duration = self.player.duration
-        if duration:
-            fmt = fmt + ' [length: {0[0]}m {0[1]}s]'.format(divmod(duration, 60))
-        return fmt.format(self.player, self.requester)
-
-class VoiceState:
-    def __init__(self, bot):
-        self.current = None
-        self.voice = None
-        self.bot = bot
-        self.play_next_song = asyncio.Event()
-        self.songs = asyncio.Queue()
-        self.skip_votes = set() # a set of user_ids that voted
-        self.audio_player = self.bot.loop.create_task(self.audio_player_task())
-
-    def is_playing(self):
-        if self.voice is None or self.current is None:
-            return False
-
-        player = self.current.player
-        return not player.is_done()
-
-    @property
-    def player(self):
-        return self.current.player
-
-    def skip(self):
-        self.skip_votes.clear()
-        if self.is_playing():
-            self.player.stop()
-
-    def toggle_next(self):
-        self.bot.loop.call_soon_threadsafe(self.play_next_song.set)
-
-    async def audio_player_task(self):
-        while True:
-            self.play_next_song.clear()
-            self.current = await self.songs.get()
-            await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
-            self.current.player.start()
-            await self.play_next_song.wait()
-
-class Music:
-    """Voice related commands.
-
-    Works in multiple servers at once.
+class Statistics:
+    """
+    Statistics
     """
     def __init__(self, bot):
         self.bot = bot
-        self.voice_states = {}
+        self.settings = dataIO.load_json('data/statistics/settings.json')
+        self.sent_messages = self.settings['SENT_MESSAGES']
+        self.received_messages = self.settings['RECEIVED_MESSAGES']
+        self.refresh_rate = self.settings['REFRESH_RATE']
 
-    def get_voice_state(self, server):
-        state = self.voice_states.get(server.id)
-        if state is None:
-            state = VoiceState(self.bot)
-            self.voice_states[server.id] = state
-
-        return state
-
-    async def create_voice_client(self, channel):
-        voice = await self.bot.join_voice_channel(channel)
-        state = self.get_voice_state(channel.server)
-        state.voice = voice
-
-    def __unload(self):
-        for state in self.voice_states.values():
-            try:
-                state.audio_player.cancel()
-                if state.voice:
-                    self.bot.loop.create_task(state.voice.disconnect())
-            except:
-                pass
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def join(self, ctx, *, channel : discord.Channel):
-        """Joins a voice channel."""
+    async def _int(self, n):
         try:
-            await self.create_voice_client(channel)
-        except discord.ClientException:
-            await self.bot.say('Already in a voice channel...')
-        except discord.InvalidArgument:
-            await self.bot.say('This is not a voice channel...')
-        else:
-            await self.bot.say('Ready to play audio in ' + channel.name)
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def summon(self, ctx):
-        """Summons the bot to join your voice channel."""
-        summoned_channel = ctx.message.author.voice_channel
-        if summoned_channel is None:
-            await self.bot.say('You are not in a voice channel.')
+            int(n)
+            return True
+        except ValueError:
             return False
 
-        state = self.get_voice_state(ctx.message.server)
-        if state.voice is None:
-            state.voice = await self.bot.join_voice_channel(summoned_channel)
-        else:
-            await state.voice.move_to(summoned_channel)
-
-        return True
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def play(self, ctx, *, song : str):
-        """Plays a song.
-
-        If there is a song currently in the queue, then it is
-        queued until the next song is done playing.
-
-        This command automatically searches as well from YouTube.
-        The list of supported sites can be found here:
-        https://rg3.github.io/youtube-dl/supportedsites.html
+    @commands.command()
+    async def stats(self):
         """
-        state = self.get_voice_state(ctx.message.server)
-        opts = {
-            'default_search': 'auto',
-            'quiet': True,
-        }
-
-        if state.voice is None:
-            success = await ctx.invoke(self.summon)
-            if not success:
-                return
-
-        try:
-            player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
-        except Exception as e:
-            fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
-            await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
-        else:
-            player.volume = 0.6
-            entry = VoiceEntry(ctx.message, player)
-            await self.bot.say('Enqueued ' + str(entry))
-            await state.songs.put(entry)
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def volume(self, ctx, value : int):
-        """Sets the volume of the currently playing song."""
-
-        state = self.get_voice_state(ctx.message.server)
-        if state.is_playing():
-            player = state.player
-            player.volume = value / 100
-            await self.bot.say('Set the volume to {:.0%}'.format(player.volume))
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def pause(self, ctx):
-        """Pauses the currently played song."""
-        state = self.get_voice_state(ctx.message.server)
-        if state.is_playing():
-            player = state.player
-            player.pause()
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def resume(self, ctx):
-        """Resumes the currently played song."""
-        state = self.get_voice_state(ctx.message.server)
-        if state.is_playing():
-            player = state.player
-            player.resume()
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def stop(self, ctx):
-        """Stops playing audio and leaves the voice channel.
-
-        This also clears the queue.
+        Retreive statistics
         """
-        server = ctx.message.server
-        state = self.get_voice_state(server)
+        message = await self.retrieve_statistics()
+        await self.bot.say(embed=message)
 
-        if state.is_playing():
-            player = state.player
-            player.stop()
-
-        try:
-            state.audio_player.cancel()
-            del self.voice_states[server.id]
-            await state.voice.disconnect()
-        except:
-            pass
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def skip(self, ctx):
-        """Vote to skip a song. The song requester can automatically skip.
-
-        3 skip votes are needed for the song to be skipped.
+    @commands.command()
+    async def statsrefresh(self, seconds: int):
         """
-
-        state = self.get_voice_state(ctx.message.server)
-        if not state.is_playing():
-            await self.bot.say('Not playing any music right now...')
-            return
-
-        voter = ctx.message.author
-        if voter == state.current.requester:
-            await self.bot.say('Requester requested skipping song...')
-            state.skip()
-        elif voter.id not in state.skip_votes:
-            state.skip_votes.add(voter.id)
-            total_votes = len(state.skip_votes)
-            if total_votes >= 3:
-                await self.bot.say('Skip vote passed, skipping song...')
-                state.skip()
+        Set the refresh rate by which the statistics are updated
+        Example: [p]statsrefresh 42
+        Default: 5
+        """
+        if await self._int(seconds):
+            if seconds < 5:
+                message = '`I can\'t do that, the refresh rate has to be above 5 seconds`'
             else:
-                await self.bot.say('Skip vote added, currently at [{}/3]'.format(total_votes))
-        else:
-            await self.bot.say('You have already voted to skip this song.')
+                self.refresh_rate = seconds
+                self.settings['REFRESH_RATE'] = self.refresh_rate
+                dataIO.save_json('data/statistics/settings.json', self.settings)
+                message = '`Changed refresh rate to {} seconds`'.format(self.refresh_rate)
+        await self.bot.say(message)
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def playing(self, ctx):
-        """Shows info about the currently played song."""
-
-        state = self.get_voice_state(ctx.message.server)
-        if state.current is None:
-            await self.bot.say('Not playing anything.')
+    @commands.command(no_pm=True)
+    @checks.serverowner_or_permissions(manage_server=True)
+    async def statschannel(self, *channel: discord.Channel):
+        """
+        Set the channel to which the bot will sent its continues updates.
+        Example: [p]statschannel #statistics
+        """
+        if len(channel) > 0:
+            self.settings['CHANNEL_ID'] = str(channel[0].id)
+            dataIO.save_json('data/statistics/settings.json', self.settings)
+            message = 'Channel set to {}'.format(channel[0].mention)
+        elif not self.settings['CHANNEL_ID']:
+            message = 'No channel set!'
         else:
-            skip_count = len(state.skip_votes)
-            await self.bot.say('Now playing {} [skips: {}/3]'.format(state.current, skip_count))
+            channel = discord.utils.get(self.bot.get_all_channels(), id=self.settings['CHANNEL_ID'])
+            message = 'Current channel is {}'.format(channel.mention)
+        await self.bot.say(message)
 
-    @commands.command(pass_context=True, hidden=True)
-    async def delcache(self, ctx):
-        if ctx.message.author.id == "203649661611802624" or ctx.message.author.id == "166179284266778624":
-            os.system("rm -rf /root/teddy/cache/*")
-            await self.bot.say("<3")
+    async def retrieve_statistics(self):
+        name = self.bot.user.name
+        try:
+            uptime = abs(self.bot.uptime - int(time.perf_counter()))
+        except TypeError:
+            uptime = time.time() - time.mktime(self.bot.uptime.timetuple())
+        up = datetime.timedelta(seconds=uptime)
+        days = up.days
+        hours = int(up.seconds/3600)
+        minutes = int(up.seconds % 3600/60)
+        users = str(len(set(self.bot.get_all_members())))
+        servers = str(len(self.bot.servers))
+        text_channels = 0
+        voice_channels = 0
+        owner = '`тeddy#7385'
+        changelog = "**Improved music , audio , playlist support- Planned**"
+
+        cpu_p = psutil.cpu_percent(interval=None, percpu=True)
+        cpu_usage = sum(cpu_p)/len(cpu_p)
+
+        mem_v = psutil.virtual_memory()
+
+        for channel in self.bot.get_all_channels():
+            if channel.type == discord.ChannelType.text:
+                text_channels += 1
+            elif channel.type == discord.ChannelType.voice:
+                voice_channels += 1
+        channels = text_channels + voice_channels
+
+        em = discord.Embed(description='\a\n', color=discord.Color.dark_blue())
+        avatar = self.bot.user.avatar_url if self.bot.user.avatar else self.bot.user.default_avatar_url
+        em.set_author(name='Statistics of {}'.format(name), icon_url=avatar)
+        em.add_field(name='Owner', value=owner)
+        em.add_field(name='**Users**', value=users)
+        em.add_field(name='**Servers**', value=servers)
+        em.add_field(name='**Uptime**', value='{} Day - {} Hr - {} Min'.format(str(days), str(hours), str(minutes)))
+        em.add_field(name='**Text channels**', value=str(text_channels))
+        em.add_field(name='**Voice channels**', value=str(voice_channels))
+        em.add_field(name='**Total channels**', value=str(channels))
+        em.add_field(name='**Messages per/server**', value=str(self.received_messages))
+        em.add_field(name='**Commands used**', value=str(self.sent_messages))
+        em.add_field(name='**Active cogs**', value=str(len(self.bot.cogs)))
+        em.add_field(name='**Online Commands**', value=str(len(self.bot.commands)))
+        em.add_field(name='\a', value='\a')
+        em.add_field(name="**Changelog:**", value=changelog)
+        em.add_field(name='\a', value='\a', inline=False)
+        em.add_field(name='**CPU usage**', value='{0:.1f}%'.format(cpu_usage))
+        em.add_field(name='**Mem usage**', value='{0:.1f}%'.format(mem_v.percent))
+        em.set_footer(text='discord.py version {}'.format(discord.__version__))
+        return em
+
+    async def incoming_messages(self, message):
+        if message.author.id == self.bot.user.id:
+            self.sent_messages += 1
         else:
-            return
-    @commands.command(pass_context=True)
-    async def queue(self, ctx):
-        state = self.get_voice_state(ctx.message.server)
-        skip_count = len(state.skip_votes)
-        data = discord.Embed(
-            color=discord.Color(value="16727871"),
-            description="Queued songs"
-        )
-        if len(state.songlist) < 1:
-            await self.bot.say("nothing is in the queue currently")
-            return
-        for i in state.songlist:
-            data.add_field(name="{}. {}".format(state.songlist.index(
-                i) + 1, i.player.title), value="Skip count: {}/{}".format(skip_count, state.votes_needed()))
-        await self.bot.say(embed=data)
+            self.received_messages += 1
+        self.settings['SENT_MESSAGES'] = self.sent_messages
+        self.settings['RECEIVED_MESSAGES'] = self.received_messages
+        dataIO.save_json('data/statistics/settings.json', self.settings)
+
+    async def reload_stats(self):
+        await asyncio.sleep(30)
+        while self == self.bot.get_cog('Statistics'):
+            if self.settings['CHANNEL_ID']:
+                msg = await self.retrieve_statistics()
+                channel = discord.utils.get(self.bot.get_all_channels(), id=self.settings['CHANNEL_ID'])
+                messages = False
+                async for message in self.bot.logs_from(channel, limit=1):
+                    messages = True
+                    if message.author.name == self.bot.user.name:
+                        await self.bot.edit_message(message, embed=msg)
+                if not messages:
+                    await self.bot.send_message(channel, embed=msg)
+            else:
+                pass
+            await asyncio.sleep(self.refresh_rate)
+
+
+def check_folder():
+    if not os.path.exists("data/statistics"):
+        print("Creating data/statistics folder...")
+        os.makedirs("data/statistics")
+
+
+def check_file():
+    data = {}
+    data['CHANNEL_ID'] = ''
+    data['SENT_MESSAGES'] = 0
+    data['RECEIVED_MESSAGES'] = 0
+    data['REFRESH_RATE'] = 5
+    f = "data/statistics/settings.json"
+    if not dataIO.is_valid_json(f):
+        print("Creating default settings.json...")
+        dataIO.save_json(f, data)
+
 
 def setup(bot):
-    n = Music(bot)
-    bot.add_cog(n)
+    if psutil is False:
+        raise RuntimeError("psutil is not installed. Do 'pip3 install psutil --upgrade' to use this cog.")
+    else:
+        check_folder()
+        check_file()
+        n = Statistics(bot)
+        bot.add_cog(n)
+        bot.add_listener(n.incoming_messages, "on_message")
+        bot.loop.create_task(n.reload_stats())

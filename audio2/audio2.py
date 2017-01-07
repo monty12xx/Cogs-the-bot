@@ -25,13 +25,12 @@ class VoiceEntry:
         return fmt.format(self.player, self.requester)
 
 class VoiceState:
-    def __init__(self, bot, cog):
+    def __init__(self, bot):
         self.volume = 0.6
         self.stop = False
         self.current = None
         self.voice = None
         self.bot = bot
-        self.cog = cog
         self.play_next_song = asyncio.Event()
         self.songs = asyncio.Queue()
         self.songlist = []

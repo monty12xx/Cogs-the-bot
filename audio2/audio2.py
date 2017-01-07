@@ -1,6 +1,24 @@
 import asyncio
 import discord
 from discord.ext import commands
+import youtube_dl
+
+
+
+youtube_dl_options = {
+    'source_address': '0.0.0.0',
+    'format': 'bestaudio/best',
+    'extractaudio': True,
+    'audioformat': "mp3",
+    'outtmpl': '%(id)s',
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': True,
+    'quiet': True,
+    'no_warnings': True,
+    'outtmpl': "data/audio/cache/%(id)s",
+    'default_search': 'auto'
+}
 
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
@@ -235,6 +253,29 @@ class Music:
         else:
             skip_count = len(state.skip_votes)
             await self.bot.say('Now playing {} [skips: {}/3]'.format(state.current, skip_count))
+
+    @commands.command(pass_context=True, hidden=True)
+    async def delcache(self, ctx):
+        if ctx.message.author.id == "203649661611802624" or ctx.message.author.id == "166179284266778624":
+            os.system("rm -rf /root/teddy/cache/*")
+            await self.bot.say("<3")
+        else:
+            return
+    @commands.command(pass_context=True)
+    async def queue(self, ctx):
+        state = self.get_voice_state(ctx.message.server)
+        skip_count = len(state.skip_votes)
+        data = discord.Embed(
+            color=discord.Color(value="16727871"),
+            description="Queued songs"
+        )
+        if len(state.songlist) < 1:
+            await self.bot.say("nothing is in the queue currently")
+            return
+        for i in state.songlist:
+            data.add_field(name="{}. {}".format(state.songlist.index(
+                i) + 1, i.player.title), value="Skip count: {}/{}".format(skip_count, state.votes_needed()))
+        await self.bot.say(embed=data)
 
 def setup(bot):
     n = Music(bot)

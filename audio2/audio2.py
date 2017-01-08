@@ -64,6 +64,18 @@ class VoiceState:
             await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
             self.current.player.start()
             await self.play_next_song.wait()
+    def _player_count(self):
+        count = 0
+        queue = copy.deepcopy(self.queue)
+        for sid in queue:
+            server = self.bot.get_server(sid)
+            try:
+                vc = self.voice_client(server)
+                if vc.audio_player.is_playing():
+                    count += 1
+            except:
+                pass
+        return count
 
 class Music:
     """Voice related commands.
@@ -263,6 +275,15 @@ class Music:
             data.add_field(name="{}. {}".format(state.songlist.index(
                 i) + 1, i.player.title), value="Skip count: {}/{}".format(skip_count, state.votes_needed()))
         await self.bot.say(embed=data)
+
+    @commands.command(name="audiostats")
+    async def audiostat(self):
+        """Number of servers currently playing."""
+
+        count = self._player_count()
+
+        await self.bot.say("Currently playing music in {} servers.".format(
+            count))
 
 def setup(bot):
     n = Music(bot)

@@ -1,7 +1,6 @@
 import asyncio
 import discord
 from discord.ext import commands
-import os
 
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
@@ -26,17 +25,13 @@ class VoiceEntry:
 
 class VoiceState:
     def __init__(self, bot):
-        self.volume = 0.6
-        self.stop = False
         self.current = None
         self.voice = None
         self.bot = bot
         self.play_next_song = asyncio.Event()
         self.songs = asyncio.Queue()
-        self.songlist = []
-        self.skip_votes = set()
+        self.skip_votes = set() # a set of user_ids that voted
         self.audio_player = self.bot.loop.create_task(self.audio_player_task())
-
 
     def is_playing(self):
         if self.voice is None or self.current is None:
@@ -64,18 +59,6 @@ class VoiceState:
             await self.bot.send_message(self.current.channel, 'Now playing ' + str(self.current))
             self.current.player.start()
             await self.play_next_song.wait()
-    def _player_count(self):
-        count = 0
-        queue = copy.deepcopy(self.queue)
-        for sid in queue:
-            server = self.bot.get_server(sid)
-            try:
-                vc = self.voice_client(server)
-                if vc.audio_player.is_playing():
-                    count += 1
-            except:
-                pass
-        return count
 
 class Music:
     """Voice related commands.
@@ -243,7 +226,7 @@ class Music:
             await self.bot.say('You have already voted to skip this song.')
 
     @commands.command(pass_context=True, no_pm=True)
-    async def playing(self, ctx):
+    async def np(self, ctx):
         """Shows info about the currently played song."""
 
         state = self.get_voice_state(ctx.message.server)
@@ -253,38 +236,11 @@ class Music:
             skip_count = len(state.skip_votes)
             await self.bot.say('Now playing {} [skips: {}/3]'.format(state.current, skip_count))
 
-    @commands.command(pass_context=True, hidden=True)
-    async def delcache(self, ctx):
-        if ctx.message.author.id == "203649661611802624" or ctx.message.author.id == "166179284266778624":
-            os.system("rm -rf /root/teddy/cache/*")
-            await self.bot.say("<3")
-        else:
-            return
-    @commands.command(pass_context=True)
-    async def queue(self, ctx):
-        state = self.get_voice_state(ctx.message.server)
-        skip_count = len(state.skip_votes)
-        data = discord.Embed(
-            color=discord.Color(value="16727871"),
-            description="Queued songs"
-        )
-        if len(state.songlist) < 1:
-            await self.bot.say("nothing is in the queue currently")
-            return
-        for i in state.songlist:
-            data.add_field(name="{}. {}".format(state.songlist.index(
-                i) + 1, i.player.title), value="Skip count: {}/{}".format(skip_count, state.votes_needed()))
-        await self.bot.say(embed=data)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('$'), description='A playlist example for discord.py')
+bot.add_cog(Music(bot))
 
-    @commands.command(name="audiostats")
-    async def audiostat(self):
-        """Number of servers currently playing."""
+@bot.event
+async def on_ready():
+    print('Logged in as:\n{0} (ID: {0.id})'.format(bot.user))
 
-        count = self._player_count()
-
-        await self.bot.say("Currently playing music in {} servers.".format(
-            count))
-
-def setup(bot):
-    n = Music(bot)
-    bot.add_cog(n)
+bot.run('token')

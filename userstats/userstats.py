@@ -119,7 +119,7 @@ class General:
                     avatar = author.avatar_url if author.avatar else author.default_avatar_url
                     if self.data[author.id]['MESSAGE']:
                         em = discord.Embed(description=self.data[author.id]['MESSAGE'], color=discord.Color.orange())
-                        em.set_author(name='{} s currently away And Says â†“â‡“âŸ±'.format(author.display_name), icon_url=avatar)
+                        em.set_author(name='{}\'s currently afk'.format(author.display_name), icon_url=avatar)
                     else:
                         em = discord.Embed(color=discord.Color.purple())
                         em.set_author(name='{} is currently away'.format(author.display_name), icon_url=avatar)

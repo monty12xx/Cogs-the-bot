@@ -125,7 +125,7 @@ class General:
                         em.set_author(name='{} is currently away'.format(author.display_name), icon_url=avatar)
                     await self.bot.send_message(message.channel, embed=em)
 
-    @commands.command(pass_context=True, name="afk", aliases=["afk"])
+    @commands.command(pass_context=True, name="afk", aliases=["away"])
     async def _away(self, context, *message: str):
         """Tell the bot you're afk or back."""
         author = context.message.author

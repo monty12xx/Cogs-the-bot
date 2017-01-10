@@ -284,12 +284,7 @@ class General:
         em = discord.Embed(description="Pong, {}ms".format(user.nick, round((t2-t1)*1000)), colour=discord.Colour(value=colour))
 
         await self.bot.say(embed=em)
-    @commands.command(pass_context=True)
-    async def test(self, message):
-        pingtime = time.time()
-        pingms = await self.bot.say("pinging server...")
-        ping = time.time() - pingtime
-        await self.bot.edit_message(pingms, "It took **%.01f** secs" % (ping) + " to ping.")
+
 
     @commands.command(pass_context=True)
     async def roll(self, ctx, number : int = 100):

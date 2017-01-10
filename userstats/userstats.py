@@ -499,18 +499,18 @@ class General:
         joined_on = "{}\n({} days ago)".format(user_joined, since_joined)
 
         if user.game is None:
-            game = "Playing â‡’ Nothing at all Â¯\_(ãƒ„)_/Â¯".format(user.name)
+            game = "not playing atm".format(user.name)
         elif user.game.url is None:
-            game = ":video_game: Playing â‡’ {}".format(user.game)
+            game = "playing {}".format(user.game)
         else:
-            game = "<:vpStreaming:212789640799846400> Streaming â‡’  [{}]({})".format(user.game, user.game.url)
+            game = "[{}]({})".format(user.game, user.game.url)
 
         if roles:
             roles = sorted(roles, key=[x.name for x in server.role_hierarchy
                                        if x.name != "@everyone"].index)
             roles = ", ".join(roles)
         else:
-            roles = ":walking: Nothing to see here Â¯\_(ãƒ„)_/Â¯\n\n"
+            roles = "NaN"
         if user.nick is not None:
             ggez = "{}".format(user.nick)
         if user.nick is None:
@@ -585,7 +585,7 @@ class General:
         if len(str(server.emojis)) < 4024 and server.emojis:
             data.add_field(name=":open_mouth:Emojis", value=" ".join([str(emoji) for emoji in server.emojis]), inline=False)
         elif len(str(server.emojis)) >= 4024:
-            data.add_field(name=":x:Emojis", value="**Error**: _What the fuck Too many fucken emojis !!_", inline=False)
+            data.add_field(name="Emojis", value="**Error**: _What the fuck Too many fucken emojis !!_", inline=False)
 
         if server.icon_url:
             data.set_author(name=server.name, url=server.icon_url)

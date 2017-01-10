@@ -514,7 +514,7 @@ class General:
         if user.nick is not None:
             ggez = "{}".format(user.nick)
         if user.nick is None:
-            ggez = "No NickName Found\n(â•¯Â°â–¡Â°ï¼‰â•¯ï¸µ â”»â”â”»"
+            ggez = "No NickName Found"
 
         if roles is None:
             user.colour = discord.Colour(value=colour)
@@ -527,7 +527,7 @@ class General:
         data.add_field(name="Highest role Colour", value="{}".format(user.colour))
         data.add_field(name="Joined this server on", value=joined_on)
         data.add_field(name="Roles", value=roles, inline=False)
-        data.set_footer(text="Userinfo | User ID â‡’  " + user.id)
+        data.set_footer(text="Userinfo | User ID" + user.id)
 
 
         if user.avatar_url:
@@ -581,7 +581,7 @@ class General:
         data.add_field(name="Afk Timeout", value="{}M".format(server.afk_timeout/60))
         data.add_field(name="Total emojis", value="{} ".format(len(server.emojis)))
 
-        data.set_footer(text="ðŸ†” Server ID â‡’  " + server.id)
+        data.set_footer(text="Server ID" + server.id)
         if len(str(server.emojis)) < 4024 and server.emojis:
             data.add_field(name=":open_mouth:Emojis", value=" ".join([str(emoji) for emoji in server.emojis]), inline=False)
         elif len(str(server.emojis)) >= 4024:

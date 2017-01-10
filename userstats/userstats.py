@@ -578,8 +578,8 @@ class General:
         data.add_field(name="Owner", value=str(server.owner))
         data.add_field(name="Verification Level", value= str(server.verification_level))
         data.add_field(name="AFK Channel", value=str(server.afk_channel).upper())
-        data.add_field(name="sleeping: Afk Timeout", value="{}M".format(server.afk_timeout/60))
-        data.add_field(name="call_me:Total emojis", value="{} ".format(len(server.emojis)))
+        data.add_field(name="Afk Timeout", value="{}M".format(server.afk_timeout/60))
+        data.add_field(name="Total emojis", value="{} ".format(len(server.emojis)))
 
         data.set_footer(text="ðŸ†” Server ID â‡’  " + server.id)
         if len(str(server.emojis)) < 4024 and server.emojis:

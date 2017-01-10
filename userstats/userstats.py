@@ -131,7 +131,7 @@ class General:
         author = context.message.author
         if author.id in self.data:
             del self.data[author.id]
-            msg = 'Welcome back :space_invader: :D.'
+            msg = 'you\'re now back.'
         else:
             self.data[context.message.author.id] = {}
             if len(str(message)) < 256:
@@ -585,7 +585,7 @@ class General:
         if len(str(server.emojis)) < 4024 and server.emojis:
             data.add_field(name=":open_mouth:Emojis", value=" ".join([str(emoji) for emoji in server.emojis]), inline=False)
         elif len(str(server.emojis)) >= 4024:
-            data.add_field(name="Emojis", value="**Error**: _What the fuck Too many fucken emojis !!_", inline=False)
+            data.add_field(name="Emojis", value="Emojis are above limit", inline=False)
 
         if server.icon_url:
             data.set_author(name=server.name, url=server.icon_url)

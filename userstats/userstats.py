@@ -125,9 +125,9 @@ class General:
                         em.set_author(name='{} is currently away'.format(author.display_name), icon_url=avatar)
                     await self.bot.send_message(message.channel, embed=em)
 
-    @commands.command(pass_context=True, name="away", aliases=["afk"])
+    @commands.command(pass_context=True, name="afk", aliases=["afk"])
     async def _away(self, context, *message: str):
-        """Tell the bot you're away or back."""
+        """Tell the bot you're afk or back."""
         author = context.message.author
         if author.id in self.data:
             del self.data[author.id]
@@ -138,7 +138,7 @@ class General:
                 self.data[context.message.author.id]['MESSAGE'] = ' '.join(context.message.clean_content.split()[1:])
             else:
                 self.data[context.message.author.id]['MESSAGE'] = True
-            msg = '__You\'re now set as away__ :wave: ,***Get out of here!*** :point_right:  :door: .'
+            msg = 'You\'re now set as afk.'
         dataIO.save_json(JSON, self.data)
         await self.bot.say(msg)
 
@@ -262,82 +262,6 @@ class General:
         dataIO.save_json(self.settings, data)
         await self.bot.say('`{}`'.format(message))
 
-    @commands.command(pass_context=True, name='weather', aliases=['we'])
-    async def _weather(self, context, *arguments: str):
-        """Get the weather!"""
-        settings = dataIO.load_json(self.settings_file)
-        api_key = settings['WEATHER_API_KEY']
-        if len(arguments) == 0:
-            message = 'No location provided.'
-        elif api_key != '':
-            try:
-                payload = {'q': " ".join(arguments), 'appid': api_key}
-                url = 'http://api.openweathermap.org/data/2.5/weather?'
-                headers = {'user-agent': 'Red-cog/1.0'}
-                conn = aiohttp.TCPConnector(verify_ssl=False)
-                session = aiohttp.ClientSession(connector=conn)
-                async with session.get(url, params=payload, headers=headers) as r:
-                    parse = await r.json()
-                session.close()
-                lat = parse['coord']['lat']
-                lng = parse['coord']['lon']
-                local_time = await self._get_local_time(lat, lng)
-                celcius = round(int(parse['main']['temp'])-273)+1
-                fahrenheit = round(int(parse['main']['temp'])*9/5-459)+2
-                temperature = '{0} Celsius / {1} Fahrenheit'.format(celcius, fahrenheit)
-                humidity = str(parse['main']['humidity']) + '%'
-                pressure = str(parse['main']['pressure']) + ' hPa'
-                wind_kmh = str(round(parse['wind']['speed'] * 3.6)) + ' km/h'
-                wind_mph = str(round(parse['wind']['speed'] * 2.23694)) + ' mph'
-                clouds = parse['weather'][0]['description'].title()
-                icon = parse['weather'][0]['icon']
-                name = parse['name'] + ', ' + parse['sys']['country']
-                city_id = parse['id']
-                em = discord.Embed(title='Weather in :earth_americas: {} - {}'.format(name, local_time), color=discord.Color.blue(), description='\a\n', url='https://openweathermap.org/city/{}'.format(city_id))
-                em.add_field(name=' :cloud: **Conditions**', value=clouds)
-                em.add_field(name=':thermometer: **Temperature**', value=temperature)
-                em.add_field(name=' :dash: **Wind**', value='{} / {}'.format(wind_kmh, wind_mph))
-                em.add_field(name=' :compression: **Pressure**', value=pressure)
-                em.add_field(name=' :sweat: **Humidity**', value=humidity)
-                em.set_thumbnail(url='https://openweathermap.org/img/w/{}.png'.format(icon))
-                em.add_field(name='\a', value='\a')
-                em.add_field(name='\a', value='\a')
-                em.set_footer(text='Weather data provided by OpenWeatherMap', icon_url='http://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/icons/logo_16x16.png')
-                await self.bot.say(embed=em)
-            except KeyError:
-                message = 'Location not found.'
-                await self.bot.say('```{}```'.format(message))
-        else:
-            message = 'No API key set. Get one at http://openweathermap.org/'
-            await self.bot.say('```{}```'.format(message))
-
-    @commands.command(pass_context=True, name='weatherkey')
-    @checks.is_owner()
-    async def _weatherkey(self, context, key: str):
-        """Acquire a key from  http://openweathermap.org/"""
-        settings = dataIO.load_json(self.settings_file)
-        settings['WEATHER_API_KEY'] = key
-        dataIO.save_json(self.settings_file, settings)
-
-    @commands.command(pass_context=True, name='timekey')
-    @checks.is_owner()
-    async def _timekey(self, context, key: str):
-        """Acquire a key from https://timezonedb.com/api"""
-        settings = dataIO.load_json(self.settings_file)
-        settings['TIME_API_KEY'] = key
-        dataIO.save_json(self.settings_file, settings)
-
-    @commands.command()
-    async def lenny(self):
-        """This does stuff( Í¡Â° ÍœÊ– Í¡Â°)!"""
-
-        await self.bot.say("( Í¡Â° ÍœÊ– Í¡Â°)")
-    @commands.command()
-    async def bangers(self):
-        """Dangerous's playlist"""
-
-        await self.bot.say(" Heres the playlist enjoy the tunes :musical_note: https://www.youtube.com/playlist?list=PL42LCVbTlLSywDEpoLDWdDdjZDVgNsD5A :musical_note: ")
-
     @commands.command(pass_context=True, no_pm=True, name='seen')
     async def _seen(self, context, username: discord.Member):
         '''seen <@username>'''
@@ -453,7 +377,7 @@ class General:
         t2 = time.perf_counter()
         if user.nick is None:
             user.nick=user.name
-        em = discord.Embed(description="Hey _{}!!_  the bloody ping is ==> _{}ms_ Das a mad ting rite!?!".format(user.nick, round((t2-t1)*1000)), colour=discord.Colour(value=colour))
+        em = discord.Embed(description="Pong, {}ms".format(user.nick, round((t2-t1)*1000)), colour=discord.Colour(value=colour))
 
         await self.bot.say(embed=em)
     @commands.command(pass_context=True)

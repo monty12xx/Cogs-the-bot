@@ -11,6 +11,7 @@ import logging
 import asyncio
 
 class channel:
+    def __init__(self, bot):
     self.bot = bot
     
 

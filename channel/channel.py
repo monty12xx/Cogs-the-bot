@@ -161,5 +161,5 @@ class channel:
         
         
 def setup(bot):
-    n = channel
+    n = channel(bot)
     bot.add_cog(n)        

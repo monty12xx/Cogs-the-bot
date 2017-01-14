@@ -14,6 +14,11 @@ class Music:
         if state is None:
             state = VoiceState(self.bot)
             self.voice_states[server.id] = state
+            
+    async def create_voice_client(self, channel):
+        voice = await self.bot.join_voice_channel(channel)
+        state = self.get_voice_state(channel.server)
+        state.voice = voice
 
     @commands.command(pass_context=True, no_pm=True)
     async def summon(self, ctx):

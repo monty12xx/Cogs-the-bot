@@ -36,6 +36,7 @@ class Music:
     @commands.command(pass_context=True, no_pm=True)
     async def playtest(self,ctx, *,song : str):
         """plays a song."""
+        state = self.get_voice_state(ctx.message.server)
         author = ctx.message.author.voice_channel
         channel = ctx.message.channel
         player = await state.voice.create_ytdl_player(song, ytdl_options=None, **kwargs)

@@ -2,13 +2,19 @@ import discord
 from discord.ext import commands
 import asyncio
 import youtube_dl
+if not discord.opus.is_loaded():
+    # the 'opus' library here is opus.dll on windows
+    # or libopus.so on linux in the current directory
+    # you should replace this with the location the
+    # opus library is located in and with the proper filename.
+    # note that on windows this DLL is automatically provided for you
+    discord.opus.load_opus('opus')
 
 
 class Music:
     def __init__(self, bot):
         self.bot = bot
         self.voice_states = []
-        self.get = get
 
     def get_voice_state(self, server):
         state = self.voice_states.get(server.id)
@@ -42,6 +48,7 @@ class Music:
         channel = ctx.message.channel
         player = await state.voice.create_ytdl_player(song, ytdl_options=None, **kwargs)
         player.start()
+        
 
 def setup(bot):
     n = Music(bot)

@@ -14,7 +14,7 @@ class Music:
         if state is None:
             state = VoiceState(self.bot)
             self.voice_states[server.id] = state
-            
+
     async def create_voice_client(self, channel):
         voice = await self.bot.join_voice_channel(channel)
         state = self.get_voice_state(channel.server)
@@ -38,7 +38,7 @@ class Music:
         """plays a song."""
         author = ctx.message.author.voice_channel
         channel = ctx.message.channel
-        player = create_ytdl_player(song, ytdl_options=None, **kwargs)
+        player = await state.voice.create_ytdl_player(song, ytdl_options=None, **kwargs)
         player.start()
 
 def setup(bot):

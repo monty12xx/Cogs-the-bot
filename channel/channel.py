@@ -22,8 +22,6 @@ class Music:
         if summoned_channel is None:
             await self.bot.say('You are not in a voice channel.')
             return False
-
-        state = self.get_voice_state(ctx.message.server)
         if state.voice is None:
             state.voice = await self.bot.join_voice_channel(summoned_channel)
         else:

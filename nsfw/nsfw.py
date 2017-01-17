@@ -37,7 +37,7 @@ class oboobs:
     def __init__(self, bot):
         self.bot = bot
         self.settings = fileIO(SETTINGS, "load")
-    @checks.is_in_server('228563019280416768')
+    @checks.is_in_servers('228563019280416768')
     @commands.group(name="oboobs", pass_context=True)
     async def _oboobs(self, ctx):
         """Only donators."""        
@@ -45,7 +45,7 @@ class oboobs:
             await send_cmd_help(ctx)
             return
 
-    @checks.is_in_server('228563019280416768')
+    @checks.is_in_servers('228563019280416768')
     @commands.command(pass_context=True, no_pm=False)
     async def boobs(self, ctx):
         """Shows some boobs."""
@@ -72,7 +72,7 @@ class oboobs:
             if self.settings["nsfw_msg"]:
                 await self.bot.say("{}` nsfw content is not allowed in this channel, instead I have send you a DM.`".format(author.mention))
 
-    @checks.is_in_server('228563019280416768')
+    @checks.is_in_servers('228563019280416768')
     @commands.command(pass_context=True, no_pm=False)
     async def ass(self, ctx):
         """Shows some ass."""
@@ -99,7 +99,7 @@ class oboobs:
             if self.settings["nsfw_msg"]:
                 await self.bot.say("{}` nsfw content is not allowed in this channel, instead I have send you a DM.`".format(author.mention))
 
-    @checks.is_in_server('228563019280416768')
+    @checks.is_in_servers('228563019280416768')
     @_oboobs.command(pass_context=True, no_pm=False)
     async def nsfw(self, ctx):
         """Toggle oboobs nswf for this channel on/off.
@@ -120,7 +120,7 @@ class oboobs:
                 await self.bot.say("{} ` nsfw OFF`".format(user.mention))
         fileIO(SETTINGS, "save", self.settings)
         
-    @checks.is_in_server('228563019280416768')
+    @checks.is_in_serverss('228563019280416768')
     @_oboobs.command(pass_context=True, no_pm=False)
     async def togglemsg(self, ctx):
         """Enable/Disable the oboobs nswf not allowed message

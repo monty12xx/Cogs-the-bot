@@ -13,20 +13,20 @@ DIR_DATA = "data/oboobs"
 SETTINGS = DIR_DATA+"/settings.json"
 
 #API info:
-#example: "/boobs/10/20/rank/" - get 20 boobs elements, start from 10th ordered by rank; noise: "/noise/{count=1; sql limit}/", 
-#example: "/noise/50/" - get 50 random noise elements; model search: "/boobs/model/{model; sql ilike}/", 
-#example: "/boobs/model/something/" - get all boobs elements, where model name contains "something", ordered by id; author search: "/boobs/author/{author; sql ilike}/", 
-#example: "/boobs/author/something/" - get all boobs elements, where author name contains "something", ordered by id; get boobs by id: "/boobs/get/{id=0}/", 
-#example: "/boobs/get/6202/" - get boobs element with id 6202; get boobs count: "/boobs/count/"; get noise count: "/noise/count/"; vote for boobs: "/boobs/vote/{id=0}/{operation=plus;[plus,minus]}/", 
-#example: "/boobs/vote/6202/minus/" - negative vote for boobs with id 6202; vote for noise: "/noise/vote/{id=0}/{operation=plus;[plus,minus]}/", 
+#example: "/boobs/10/20/rank/" - get 20 boobs elements, start from 10th ordered by rank; noise: "/noise/{count=1; sql limit}/",
+#example: "/noise/50/" - get 50 random noise elements; model search: "/boobs/model/{model; sql ilike}/",
+#example: "/boobs/model/something/" - get all boobs elements, where model name contains "something", ordered by id; author search: "/boobs/author/{author; sql ilike}/",
+#example: "/boobs/author/something/" - get all boobs elements, where author name contains "something", ordered by id; get boobs by id: "/boobs/get/{id=0}/",
+#example: "/boobs/get/6202/" - get boobs element with id 6202; get boobs count: "/boobs/count/"; get noise count: "/noise/count/"; vote for boobs: "/boobs/vote/{id=0}/{operation=plus;[plus,minus]}/",
+#example: "/boobs/vote/6202/minus/" - negative vote for boobs with id 6202; vote for noise: "/noise/vote/{id=0}/{operation=plus;[plus,minus]}/",
 #example: "/noise/vote/57/minus/" - negative vote for noise with id 57;
 
-#example: "/butts/10/20/rank/" - get 20 butts elements, start from 10th ordered by rank; noise: "/noise/{count=1; sql limit}/", 
-#example: "/noise/50/" - get 50 random noise elements; model search: "/butts/model/{model; sql ilike}/", 
-#example: "/butts/model/something/" - get all butts elements, where model name contains "something", ordered by id; author search: "/butts/author/{author; sql ilike}/", 
-#example: "/butts/author/something/" - get all butts elements, where author name contains "something", ordered by id; get butts by id: "/butts/get/{id=0}/", 
-#example: "/butts/get/6202/" - get butts element with id 6202; get butts count: "/butts/count/"; get noise count: "/noise/count/"; vote for butts: "/butts/vote/{id=0}/{operation=plus;[plus,minus]}/", 
-#example: "/butts/vote/6202/minus/" - negative vote for butts with id 6202; vote for noise: "/noise/vote/{id=0}/{operation=plus;[plus,minus]}/", 
+#example: "/butts/10/20/rank/" - get 20 butts elements, start from 10th ordered by rank; noise: "/noise/{count=1; sql limit}/",
+#example: "/noise/50/" - get 50 random noise elements; model search: "/butts/model/{model; sql ilike}/",
+#example: "/butts/model/something/" - get all butts elements, where model name contains "something", ordered by id; author search: "/butts/author/{author; sql ilike}/",
+#example: "/butts/author/something/" - get all butts elements, where author name contains "something", ordered by id; get butts by id: "/butts/get/{id=0}/",
+#example: "/butts/get/6202/" - get butts element with id 6202; get butts count: "/butts/count/"; get noise count: "/noise/count/"; vote for butts: "/butts/vote/{id=0}/{operation=plus;[plus,minus]}/",
+#example: "/butts/vote/6202/minus/" - negative vote for butts with id 6202; vote for noise: "/noise/vote/{id=0}/{operation=plus;[plus,minus]}/",
 #example: "/noise/vote/57/minus/" - negative vote for noise with id 57;
 
 class oboobs:
@@ -40,7 +40,7 @@ class oboobs:
     @checks.is_in_servers('228563019280416768')
     @commands.group(name="oboobs", pass_context=True)
     async def _oboobs(self, ctx):
-        """Only donators."""        
+        """Only donators."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
             return
@@ -56,7 +56,7 @@ class oboobs:
                 nsfwChan = True
                 break
         try:
-            rdm = random.randint(0, 10162)      
+            rdm = random.randint(0, 10162)
             search = ("http://api.oboobs.ru/boobs/{}".format(rdm))
             async with aiohttp.get(search) as r:
                 result = await r.json()
@@ -83,7 +83,7 @@ class oboobs:
                 nsfwChan = True
                 break
         try:
-            rdm = random.randint(0, 4155)        
+            rdm = random.randint(0, 4155)
             search = ("http://api.obutts.ru/butts/{}".format(rdm))
             async with aiohttp.get(search) as r:
                 result = await r.json()
@@ -119,8 +119,8 @@ class oboobs:
                 self.settings["nsfw_channels"].append(ctx.message.channel.id)
                 await self.bot.say("{} ` nsfw OFF`".format(user.mention))
         fileIO(SETTINGS, "save", self.settings)
-        
-    @checks.is_in_serverss('228563019280416768')
+
+    @checks.is_in_servers('228563019280416768')
     @_oboobs.command(pass_context=True, no_pm=False)
     async def togglemsg(self, ctx):
         """Enable/Disable the oboobs nswf not allowed message

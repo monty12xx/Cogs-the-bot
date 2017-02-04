@@ -100,10 +100,10 @@ class REPL:
             try:
                 if fmt is not None:
                     if len(fmt) > 2000:
-                        for i, page in enumerate(fmt):
-                            await self.bot.say(box(page, fmt))
-                        else:
-                            await self.bot.send_message(msg.channel, fmt)
+
+                        await self.bot.say(pagify(fmt))
+                    else:
+                        await self.bot.send_message(msg.channel, fmt)
             except discord.Forbidden:
                 pass
             except discord.HTTPException as e:

@@ -2,16 +2,13 @@ from discord.ext import commands
 from .utils import checks
 import asyncio
 import traceback
-import discord
-import inspect
-from contextlib import redirect_stdout
-import io
-from .utils.chat_formatting import pagify, box
+
+# Credit goes to Rapptz and RoboDanny
+
 
 class REPL:
     def __init__(self, bot):
         self.bot = bot
-        self.sessions = set()
 
     def cleanup_code(self, content):
         """Automatically removes code blocks from the code."""
@@ -26,27 +23,18 @@ class REPL:
         return '```py\n{0.text}{1:>{0.offset}}\n{2}: {0}```'.format(e, '^', type(e).__name__)
 
     @commands.command(pass_context=True, hidden=True)
+    @checks.is_owner()
     async def repl(self, ctx):
-        allowed = ["203649661611802624", "166179284266778624"]
-        if not ctx.message.author.id in allowed:
-            return
         msg = ctx.message
 
-        variables = {
+        repl_locals = {}
+        repl_globals = {
             'ctx': ctx,
             'bot': self.bot,
             'message': msg,
-            'server': msg.server,
-            'channel': msg.channel,
-            'author': msg.author,
-            '_': None,
+            'asyncio': asyncio
         }
 
-        if msg.channel.id in self.sessions:
-            await self.bot.say('Already running a REPL session in this channel. Exit it with `quit`.')
-            return
-
-        self.sessions.add(msg.channel.id)
         await self.bot.say('Enter code to execute or evaluate. `exit()` or `quit` to exit.')
         while True:
             response = await self.bot.wait_for_message(author=msg.author, channel=msg.channel,
@@ -56,7 +44,6 @@ class REPL:
 
             if cleaned in ('quit', 'exit', 'exit()'):
                 await self.bot.say('Exiting.')
-                self.sessions.remove(msg.channel.id)
                 return
 
             executor = exec
@@ -76,38 +63,18 @@ class REPL:
                     await self.bot.say(self.get_syntax_error(e))
                     continue
 
-            variables['message'] = response
-
-            fmt = None
-            stdout = io.StringIO()
+            repl_globals['message'] = response
 
             try:
-                with redirect_stdout(stdout):
-                    result = executor(code, variables)
-                    if inspect.isawaitable(result):
-                        result = await result
+                result = executor(code, repl_globals, repl_locals)
+                if asyncio.iscoroutine(result):
+                    result = await result
             except Exception as e:
-                value = stdout.getvalue()
-                fmt = '```py\n{}{}\n```'.format(value, traceback.format_exc())
+                await self.bot.say('```py\n{}\n```'.format(traceback.format_exc()))
             else:
-                value = stdout.getvalue()
                 if result is not None:
-                    fmt = '```py\n{}{}\n```'.format(value, result)
-                    variables['_'] = result
-                elif value:
-                    fmt = '```py\n{}\n```'.format(value)
+                    await self.bot.say('```py\n{}\n```'.format(result))
 
-            try:
-                if fmt is not None:
-                    if len(fmt) > 2000:
-
-                        await self.bot.say(pagify(fmt))
-                    else:
-                        await self.bot.send_message(msg.channel, fmt)
-            except discord.Forbidden:
-                pass
-            except discord.HTTPException as e:
-                await self.bot.send_message(msg.channel, 'Unexpected error: `{}`'.format(e))
 
 def setup(bot):
     bot.add_cog(REPL(bot))

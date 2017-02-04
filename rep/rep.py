@@ -100,9 +100,9 @@ class REPL:
             try:
                 if fmt is not None:
                     if len(fmt) > 2000:
-                        await self.bot.say(box(page, fmt))
+                        await self.bot.say(box(pagify, fmt))
                     else:
-                        await self.bot.say(box(page, fmt))
+                        await self.bot.say(box(pagify, fmt))
             except discord.Forbidden:
                 pass
             except discord.HTTPException as e:

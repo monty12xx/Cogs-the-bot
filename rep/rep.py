@@ -97,16 +97,22 @@ class REPL:
                 elif value:
                     fmt = '```py\n{}\n```'.format(value)
 
-            try:
-                if fmt is not None:
-                    if len(fmt) > 2000:
-                        await self.bot.say(pagify, fmt)
-                    else:
-                        await self.bot.say(pagify, fmt)
-            except discord.Forbidden:
-                pass
-            except discord.HTTPException as e:
-                await self.bot.say(msg.channel, 'Unexpected error: `{}`'.format(e))
+                for i, page in enumerate(result):
+                    if i != 0 and i % 4 == 0:
+                        last = await self.bot.say("There are still {} messages. "
+                                                  "Type `more` to continue."
+                                                  "".format(len(result) - (i + 1)))
+                        msg = await  self.bot.wait_for_message(author=author, channel=channel, check=check, timeout=10)
+                        if msg is None:
+                            try:
+                                await self.bot.delete_message(last)
+                            except:
+                                pass
+                            finally:
+                                break
+                    await self.bot.say(box(page, lang="py"))
+
+
 
 def setup(bot):
     bot.add_cog(REPL(bot))

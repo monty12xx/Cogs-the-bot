@@ -8,6 +8,7 @@ class announce:
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(pass_context=True)
     async def announce(self, ctx, *, announcement: str):
         """Announce events using Kairos"""
         allowed = ["203649661611802624", "166179284266778624"]
@@ -27,7 +28,7 @@ class announce:
                     pass
                 except discord.RuntimeError:
                     pass
-        await bot.reply("Announcement done!\n Announced in {} Servers!!".format(serv_count))
+        await bot.reply("Announcement done!\n Announced in {} Servers!!".format(serv_count))))
 
 def setup(bot):
     bot.add_cog(announce(bot))

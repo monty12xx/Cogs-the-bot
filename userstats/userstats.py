@@ -231,13 +231,17 @@ class General:
             await self.bot.say(msg + "```")
 
     @commands.command()
-    async def penis(self, user : discord.Member):
+    async def penis(self, user: discord.Member):
         """Detects user's penis length
 
         This is 100% accurate."""
-        random.seed(user.id)
-        p = "8" + "="*random.randint(0, 50) + "D"
-        await self.bot.say("Size: " + p)
+        if user.id == 203649661611802624:
+            return await self.bot.say(
+                "8========================================================================================================================D")
+        else:
+            random.seed(user.id)
+            p = "8" + "=" * random.randint(0, 50) + "D"
+            await self.bot.say("Size: " + p)
 
     @commands.command(pass_context=True)
     async def quote(self, ctx, message_id = None):

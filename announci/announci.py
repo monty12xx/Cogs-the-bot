@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from cogs.utils import checks
 
+
 class announce:
     """Announce"""
 
@@ -15,20 +16,22 @@ class announce:
         if not ctx.message.author.id in allowed:
             return
         serv_count = 0
-        for server in bot.servers:
+        servs = []
+        for s in self.bot.servers:
+            servs.append(s)
+        for server in servs:
             if server.id == "110373943822540800":
                 pass
             else:
                 try:
-                    await bot.send_message(server, announcement)
+                    await self.bot.send_message(server, announcement)
                     serv_count = serv_count + 1
                 except discord.Forbidden:
                     pass
                 except discord.HTTPException:
                     pass
-                except discord.RuntimeError:
-                    pass
-        await bot.reply("Announcement done!\n Announced in {} Servers!!".format(serv_count))))
+        await self.bot.reply("Announcement done!\n Announced in {} Servers!!".format(serv_count))
+
 
 def setup(bot):
     bot.add_cog(announce(bot))
